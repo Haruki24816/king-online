@@ -22,24 +22,24 @@ def index():
 @app.route("/newgame")
 def newgame():
     name = request.args.get("name")
-    game_id = str(uuid.uuid1())
+    game_id = uuid.uuid1()
 
     if name in ["", None]:
         name = "名無し"
 
     games[game_id] = Game(game_id, name)
-    return redirect(game_id)
+    return redirect(f"/{game_id}")
 
 
-@app.route("/<game_id>")
+@app.route("/<uuid:game_id>")
 def game(game_id):
-    if game_id not in games:
+    if game_id in games:
+        if games[game_id].is_wanted:
+            return render_template("game.html", game_id=str(game_id), name=games[game_id].name)
+        else:
+            return render_template("error.html", message="この部屋は現在、プレイヤーを募集していません。")
+    else:
         return render_template("error.html", message="存在しない部屋です。")
-
-    if games[game_id].is_wanted == False:
-        return render_template("error.html", message="この部屋は現在、プレイヤーを募集していません。")
-
-    return render_template("game.html", game_id=game_id, name=games[game_id].name)
 
 
 if __name__ == "__main__":
