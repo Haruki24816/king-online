@@ -1,5 +1,7 @@
+import os
 import uuid
 from flask import Flask, render_template, redirect, url_for, request
+from flask_socketio import SocketIO
 
 
 class Game:
@@ -11,6 +13,8 @@ class Game:
 
 
 app = Flask(__name__)
+app.config["SECRET_KEY"] = os.urandom(24)
+socketio = SocketIO(app)
 games = {}
 
 
@@ -43,4 +47,4 @@ def game(game_id):
 
 
 if __name__ == "__main__":
-    app.run()
+    socketio.run(app)
