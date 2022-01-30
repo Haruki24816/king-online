@@ -9,7 +9,8 @@ class Game:
     def __init__(self, game_id, name):
         self.game_id = game_id
         self.name = name
-        self.is_wanted = True
+        self.num = 0
+        self.status = "募集中"
 
 
 app = Flask(__name__)
@@ -37,13 +38,17 @@ def newgame():
 
 @app.route("/<uuid:game_id>")
 def game(game_id):
-    if game_id in games:
-        if games[game_id].is_wanted:
-            return render_template("game.html", game_id=str(game_id), name=games[game_id].name)
-        else:
-            return render_template("error.html", message="この部屋は現在、プレイヤーを募集していません。")
-    else:
+    if game_id not in games:
         return render_template("error.html", message="存在しない部屋です。")
+
+    if games[game_id].status != "募集中":
+        return render_template("error.html", message="この部屋は現在、プレイヤーを募集していません。")
+
+    name = games[game_id].name
+    status = games[game_id].status
+    num = games[game_id].num
+    game_id = str(game_id)
+    return render_template("game.html", name=name, status=status, num=num, game_id=game_id)
 
 
 if __name__ == "__main__":

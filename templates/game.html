@@ -8,8 +8,12 @@
     <title>King Online</title>
   </head>
   <body>
-    <p>{{ game_id }}</p>
-    <p>{{ name }}</p>
+    <header>
+      <h1>{{ name }}</h1>
+      <p>{{ status }} ･ {{ num }}人参加</p>
+    </header>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+    <script>const game_id = "{{ game_id }}"</script>
+    <script src="/static/js/game.js"></script>
   </body>
 </html>
