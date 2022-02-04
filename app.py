@@ -1,7 +1,8 @@
 import os
 import uuid
-from flask import Flask, render_template, redirect, url_for, request
-from flask_socketio import SocketIO
+from datetime import timedelta
+from flask import Flask, render_template, redirect, url_for, request, session
+from flask_socketio import SocketIO, emit, join_room
 
 
 class Game:
@@ -15,6 +16,7 @@ class Game:
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.urandom(24)
+app.permanent_session_lifetime = timedelta(days=1)
 socketio = SocketIO(app)
 games = {}
 
@@ -49,6 +51,27 @@ def game(game_id):
     num = games[game_id].num
     game_id = str(game_id)
     return render_template("game.html", name=name, status=status, num=num, game_id=game_id)
+
+
+@socketio.on("connect")
+def on_connect(auth):
+    print("接続")
+
+
+@socketio.on("disconnect")
+def on_disconnect():
+    print("切断")
+
+
+@socketio.on("join")
+def join(data):
+    session["game_id"] = data["game_id"]
+    join_room(data["game_id"])
+
+
+@socketio.on("message")
+def on_message(data):
+    emit("message", {"message": data["message"]}, to=session["game_id"])
 
 
 if __name__ == "__main__":
