@@ -13,10 +13,13 @@
       <p>オリジナルカードゲーム「キング」のオンラインゲーム</p>
     </header>
     <h2>部屋に入る</h2>
-    <p>部屋のURLを共有してもらってください。そのURLにアクセスすることで部屋に入ることができます。</p>
+    <p>部屋のURLを教えてもらってください。URLにアクセスすることで部屋に入ることができます。</p>
     <h2>部屋を作る</h2>
-    <form action="/newgame">
-      <label for="name">部屋の名前：<input type="text" name="name" id="name"></label>
+    <form action="/make_room">
+      <label>
+        部屋の名前：
+        <input type="text" name="room_name">
+      </label>
       <button type="submit">作る</button>
     </form>
   </body>
