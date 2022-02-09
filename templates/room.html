@@ -5,13 +5,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://fonts.xz.style/serve/inter.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.2/new.min.css">
+    <style>
+      pre {
+        height: 30vh;
+        overflow-y: scroll;
+      }
+    </style>
     <title>King Online</title>
   </head>
   <body>
     <header>
       <h1 id="room_name"></h1>
-      <p id="room_status"></p>
+      <p id="description"></p>
     </header>
+    <pre id="log"></pre>
+    <p id="player_name_form">
+      <label>プレイヤー名：<input type="text"></label>
+      <button>送信</button>
+    </p>
+    <p id="message_form">
+      <label>メッセージ：<input type="text"></label>
+      <button>送信</button>
+    </p>
+    <p>
+      <button id="player_status_button">準備完了</button>
+      <button id="draw_red_card_button">赤カードを引く</button>
+      <button id="draw_green_card_button">緑カードを引く</button>
+      <button id="draw_blue_card_button">青カードを引く</button>
+    </p>
+    <p id="pay_form">
+      支払額：<br>
+      <label>100円×<input type="number" value=0 class="100"></label><br>
+      <label>500円×<input type="number" value=0 class="500"></label><br>
+      <label>1,000円×<input type="number" value=0 class="1,000"></label><br>
+      <label>2,000円×<input type="number" value=0 class="2,000"></label><br>
+      <label>キング×<input type="number" value=0 class="king"></label><br>
+      <button>支払</button>
+    </p>
+    <p id="borrow_form">
+      借金額：<br>
+      <label>100円×<input type="number" value=0 class="100"></label><br>
+      <label>500円×<input type="number" value=0 class="500"></label><br>
+      <label>1,000円×<input type="number" value=0 class="1,000"></label><br>
+      <label>2,000円×<input type="number" value=0 class="2,000"></label><br>
+      <label>キング×<input type="number" value=0 class="king"></label><br>
+      <button>借金</button>
+    </p>
+    <p id="repay_form">
+      返済額：<br>
+      <label>100円×<input type="number" value=0 class="100"></label><br>
+      <label>500円×<input type="number" value=0 class="500"></label><br>
+      <label>1,000円×<input type="number" value=0 class="1,000"></label><br>
+      <label>2,000円×<input type="number" value=0 class="2,000"></label><br>
+      <label>キング×<input type="number" value=0 class="king"></label><br>
+      <button>返済</button>
+    </p>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
     <script>const room_id = "{{ room_id }}";</script>
     <script src="/static/js/room.js"></script>
