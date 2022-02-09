@@ -5,14 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://fonts.xz.style/serve/inter.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.2/new.min.css">
-    <link rel="stylesheet" href="/static/css/room.css">
     <title>King Online</title>
   </head>
   <body>
-    <p id="connection_status">接続待機中</p>
-    <header id="header" class="hidden">
+    <header>
       <h1 id="room_name"></h1>
-      <p id="room_description"></p>
+      <p id="room_status"></p>
     </header>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
     <script>const room_id = "{{ room_id }}";</script>
