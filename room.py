@@ -4,64 +4,119 @@ import random
 class Room:
 
     def __init__(self, name):
-        if name in ("", None):
+        name = str(name)
+
+        if name in ("", "None"):
             name = "名前のない部屋"
 
-        self.name = name     #部屋の名前
-        self.in_game = False #ゲーム中かどうか
-        self.players = {}    #プレイヤー情報
+        self.name = name  #部屋の名前
+        self.status = 0   #部屋のステータス 募集中：0 準備中：-1 返済待ち：-2 ゲーム終了時：-3 ゲーム中：1以上（周数）
+        self.players = {} #プレイヤー情報
 
-        self.deck = None               #山札 リスト
-        self.lap = None                #周 数 15枚引くのを待つときは-1 返済待ちのときは-2
-        self.order = None              #プレイヤーの順番 sidのリスト
-        self.turn = None               #順番 数
-        self.is_payment_waiting = None #支払い待ちかどうか
+        self.deck = None  #山札 リスト
+        self.order = None #プレイヤーの順番 sidのリスト
+        self.turn = None  #順番 整数 支払い待ちのときはマイナス
+
+    def info(self):
+        data = {
+            "room_name": self.name,
+            "room_status": self.status,
+            "players": self.players,
+            "deck": self.deck,
+            "order": self.order,
+            "turn": self.turn
+        }
+
+        return data
 
     def add_player(self, sid):
+        sid = str(sid)
+
+        if self.status != 0:
+            raise Exception("ゲーム進行中のため追加できません")
+
+        if sid in self.players:
+            raise ValueError("このプレイヤーはすでに追加されています")
+
         self.players[sid] = {
-            "name": "",        #プレイヤー名
-            "is_ready": False, #準備ができているか
-            "hand": None,      #手札 リスト
-            "debt": None       #借金 辞書
+            "name": "",   #プレイヤー名
+            "status": 0,  #プレイヤーのステータス 未準備：0 準備完了：1 ゲーム中：2
+            "hand": None, #手札 リスト
+            "debt": None  #借金 辞書
         }
 
     def remove_player(self, sid):
+        sid = str(sid)
         self.players.pop(sid)
-        self.prepare()
+
+        try:
+            self.prepare()
+        except Exception:
+            pass
+
+        try:
+            self.finish()
+        except Exception:
+            pass
 
     def register_player_name(self, sid, name):
-        name = name.rstrip("′")
+        sid = str(sid)
+        name = str(name)
 
-        count = 0
-        for value in self.players.values():
-            if value["name"].rstrip("′") == name:
-                count += 1
+        if self.status != 0:
+            raise Exception("ゲーム進行中のため登録できません")
 
-        for num in range(count):
-            name += "′"
+        if name in ("", "None"):
+            raise ValueError("無効な名前です")
+
+        if self.players[sid]["name"] != "":
+            raise ValueError("このプレイヤーはすでに名前が登録されています")
+
+        for player in self.players.values():
+            if player["name"] == name:
+                raise ValueError("この名前は他プレイヤーに使われています")
 
         self.players[sid]["name"] = name
 
-    def ready(self, sid):
-        self.players[sid]["is_ready"] = True
-        self.prepare()
+    def update_player_status(self, sid, status):
+        sid = str(sid)
+        status = int(status)
+
+        if self.status != 0:
+            raise Exception("ゲーム進行中のため更新できません")
+
+        if self.players[sid]["name"] == "":
+            raise ValueError("このプレイヤーは名前が登録されていません")
+
+        if status not in (0, 1):
+            raise ValueError("無効な番号です")
+
+        self.players[sid]["status"] = status
+
+        try:
+            self.prepare()
+        except Exception:
+            pass
 
     def prepare(self):
+        if self.status != 0:
+            raise Exception("ゲーム進行中です")
+
         if len(self.players) < 2:
-            return
+            raise Exception("プレイヤー人数が足りません")
 
         count = 0
-        for value in self.players.values():
-            if not value["is_ready"]:
+        for player in self.players.values():
+            if player["status"] == 0:
                 count += 1
 
         if count != 0:
-            return
+            raise Exception("準備ができていないプレイヤーがいます")
 
-        for value in self.players.values():
-            value["is_ready"] = False
-            value["hand"] = []
-            value["debt"] = {}
+        for player in self.players.values():
+            player["status"] = 2
+            player["hand"] = []
+            player["debt"] = {}
 
         self.deck = []
         for color in ("r", "g", "b"):
@@ -77,7 +132,8 @@ class Room:
         self.order = list(self.players.keys())
         random.shuffle(self.order)
 
-        self.in_game = True
-        self.lap = -1
+        self.status = -1
         self.turn = 0
-        self.is_payment_waiting = False
+
+    def finish(self):
+        pass
