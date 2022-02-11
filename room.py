@@ -13,9 +13,10 @@ class Room:
         self.status = 0   #部屋のステータス 募集中：0 準備中：-1 返済待ち：-2 ゲーム終了時：-3 ゲーム中：1以上（周数）
         self.players = {} #プレイヤー情報
 
-        self.deck = None  #山札 リスト
-        self.order = None #プレイヤーの順番 sidのリスト
-        self.turn = None  #順番 整数 支払い待ちのときはマイナス
+        self.deck = None               #山札 辞書
+        self.order = None              #プレイヤーの順番 sidのリスト
+        self.turn = None               #順番 整数
+        self.is_payment_waiting = None #支払い待ちかどうか
 
     def info(self):
         data = {
@@ -24,7 +25,8 @@ class Room:
             "players": self.players,
             "deck": self.deck,
             "order": self.order,
-            "turn": self.turn
+            "turn": self.turn,
+            "is_payment_waiting": self.is_payment_waiting
         }
 
         return data
@@ -41,7 +43,7 @@ class Room:
         self.players[sid] = {
             "name": "",   #プレイヤー名
             "status": 0,  #プレイヤーのステータス 未準備：0 準備完了：1 ゲーム中：2
-            "hand": None, #手札 リスト
+            "hand": None, #手札 辞書
             "debt": None  #借金 辞書
         }
 
@@ -50,12 +52,10 @@ class Room:
         self.players.pop(sid)
 
         try:
-            self.prepare()
-        except Exception:
-            pass
-
-        try:
-            self.finish()
+            if self.status == 0:
+                self.prepare()
+            else:
+                self.finish()
         except Exception:
             pass
 
@@ -115,25 +115,85 @@ class Room:
 
         for player in self.players.values():
             player["status"] = 2
-            player["hand"] = []
+            player["hand"] = {}
             player["debt"] = {}
 
-        self.deck = []
+        self.deck = {}
         for color in ("r", "g", "b"):
-            for num in range(36):
-                self.deck.append(color + "1")
-            for num in range(8):
-                self.deck.append(color + "5")
-            for num in range(4):
-                self.deck.append(color + "k")
-            for num in range(4):
-                self.deck.append(color + "a")
+            self.deck[color + "1"] = 36
+            self.deck[color + "5"] = 8
+            self.deck[color + "k"] = 4
+            self.deck[color + "a"] = 4
 
         self.order = list(self.players.keys())
         random.shuffle(self.order)
 
         self.status = -1
         self.turn = 0
+        self.is_payment_waiting = False
 
     def finish(self):
-        pass
+        if self.status == 0:
+            raise Exception("ゲーム進行中ではありません")
+
+        for player in self.players.values():
+            player["status"] = 0
+            player["hand"] = None
+            player["debt"] = None
+
+        self.status = 0
+        self.deck = None
+        self.order = None
+        self.turn = None
+        self.is_payment_waiting = None
+
+    def draw(self, sid, color=None):
+        sid = str(sid)
+        color = str(color)
+
+        if self.status in (0, -2, -3):
+            raise Exception("カードを引けません")
+
+        if color not in ("r", "g", "b", "None"):
+            raise ValueError("無効な値です")
+
+        if self.order[self.turn] != sid:
+            raise ValueError("このプレイヤーの番ではありません")
+
+        if self.is_payment_waiting:
+            raise Exception("カードを引けません")
+
+        if color == "None":
+            colors = ("r", "g", "b")
+        else:
+            colors = (color)
+
+        unpacked_deck = []
+        for kind, card_num in self.deck.items():
+            if kind[0] in colors:
+                for num in range(card_num):
+                    unpacked_deck.append(kind)
+
+        chosen_kind = random.choice(unpacked_deck)
+
+        if chosen_kind not in self.players[sid]["hand"]:
+            self.players[sid]["hand"][chosen_kind] = 0
+
+        self.players[sid]["hand"][chosen_kind] += 1
+        self.deck[chosen_kind] -= 1
+
+        if self.deck[chosen_kind] == 0:
+            self.deck.pop(chosen_kind)
+
+        if self.status > 0:
+            self.is_payment_waiting = True
+
+        if self.status == -1:
+            count = 0
+            for num in self.players[sid]["hand"].values():
+                count += num
+            if count == 15:
+                self.turn += 1
+            if self.turn == len(self.order):
+                self.turn = 0
+                self.status = 1
