@@ -147,53 +147,94 @@ class Room:
         self.turn = None
         self.is_payment_waiting = None
 
-    def draw(self, sid, color=None):
+    def draw_fifteen(self, sid, *, red=0, green=0, blue=0):
         sid = str(sid)
-        color = str(color)
+        red = int(red)
+        green = int(green)
+        blue = int(blue)
 
-        if self.status in (0, -2, -3):
+        if self.status != -1:
             raise Exception("カードを引けません")
-
-        if color not in ("r", "g", "b", "None"):
-            raise ValueError("無効な値です")
 
         if self.order[self.turn] != sid:
             raise ValueError("このプレイヤーの番ではありません")
 
+        if (red+green+blue) not in (0, 15):
+            raise ValueError("無効な値です")
+
+        red_cards = []
+        green_cards = []
+        blue_cards = []
+        for kind, card_num in self.deck.items():
+            if kind[0] == "r":
+                for num in range(card_num):
+                    red_cards.append(kind)
+            if kind[0] == "g":
+                for num in range(card_num):
+                    green_cards.append(kind)
+            if kind[0] == "r":
+                for num in range(card_num):
+                    blue_cards.append(kind)
+
+        if (red+green+blue) == 0:
+            all_cards = red_cards + green_cards + blue_cards
+            chosen_cards = random.sample(all_cards, 15)
+        else:
+            chosen_red_cards = random.sample(red_cards, red)
+            chosen_green_cards = random.sample(green_cards, green)
+            chosen_blue_cards = random.sample(blue_cards, blue)
+            chosen_cards = chosen_red_cards + chosen_green_cards + chosen_blue_cards
+
+        for card in chosen_cards:
+            if card not in self.players[sid]["hand"]:
+                self.players[sid]["hand"][card] = 0
+            self.players[sid]["hand"][card] += 1
+            self.deck[card] -= 1
+            if self.deck[card] == 0:
+                self.deck.pop(card)
+
+        self.turn += 1
+
+        if self.turn == len(self.order):
+            self.turn = 0
+            self.status = 1
+
+    def draw(self, sid, color=None):
+        sid = str(sid)
+        color = str(color)
+
+        if self.status < 1:
+            raise Exception("カードを引けません")
+
         if self.is_payment_waiting:
             raise Exception("カードを引けません")
+
+        if self.order[self.turn] != sid:
+            raise ValueError("このプレイヤーの番ではありません")
+
+        if color not in ("r", "g", "b", "None"):
+            raise ValueError("無効な値です")
 
         if color == "None":
             colors = ("r", "g", "b")
         else:
             colors = (color)
 
-        unpacked_deck = []
+        cards = []
         for kind, card_num in self.deck.items():
             if kind[0] in colors:
                 for num in range(card_num):
-                    unpacked_deck.append(kind)
+                    cards.append(kind)
 
-        chosen_kind = random.choice(unpacked_deck)
+        chosen_card = random.choice(cards)
 
-        if chosen_kind not in self.players[sid]["hand"]:
-            self.players[sid]["hand"][chosen_kind] = 0
+        if card not in self.players[sid]["hand"]:
+            self.players[sid]["hand"][card] = 0
 
-        self.players[sid]["hand"][chosen_kind] += 1
-        self.deck[chosen_kind] -= 1
+        self.players[sid]["hand"][card] += 1
+        self.deck[card] -= 1
 
-        if self.deck[chosen_kind] == 0:
-            self.deck.pop(chosen_kind)
+        if self.deck[card] == 0:
+            self.deck.pop(card)
 
-        if self.status > 0:
-            self.is_payment_waiting = True
-
-        if self.status == -1:
-            count = 0
-            for num in self.players[sid]["hand"].values():
-                count += num
-            if count == 15:
-                self.turn += 1
-            if self.turn == len(self.order):
-                self.turn = 0
-                self.status = 1
+        self.is_payment_waiting = True
