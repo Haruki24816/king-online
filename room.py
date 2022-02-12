@@ -41,10 +41,12 @@ class Room:
             raise ValueError("このプレイヤーはすでに追加されています")
 
         self.players[sid] = {
-            "name": "",   #プレイヤー名
-            "status": 0,  #プレイヤーのステータス 未準備：0 準備完了：1 ゲーム中：2
-            "hand": None, #手札 辞書
-            "debt": None  #借金 辞書
+            "name": "",    #プレイヤー名
+            "status": 0,   #プレイヤーのステータス 未準備：0 準備完了：1 ゲーム中：2
+            "hand": None,  #手札 辞書
+            "debt": None,  #借金 辞書
+            "drawn": None, #引いた額 整数
+            "paid": None   #支払った額 整数
         }
 
     def remove_player(self, sid):
@@ -117,6 +119,8 @@ class Room:
             player["status"] = 2
             player["hand"] = {}
             player["debt"] = {}
+            player["drawn"] = 0
+            player["paid"] = 0
 
         self.deck = {}
         for color in ("r", "g", "b"):
@@ -140,6 +144,8 @@ class Room:
             player["status"] = 0
             player["hand"] = None
             player["debt"] = None
+            player["drawn"] = None
+            player["paid"] = None
 
         self.status = 0
         self.deck = None
@@ -228,13 +234,96 @@ class Room:
 
         chosen_card = random.choice(cards)
 
-        if card not in self.players[sid]["hand"]:
-            self.players[sid]["hand"][card] = 0
+        if chosen_card not in self.players[sid]["hand"]:
+            self.players[sid]["hand"][chosen_card] = 0
 
-        self.players[sid]["hand"][card] += 1
-        self.deck[card] -= 1
+        self.players[sid]["hand"][chosen_card] += 1
+        self.deck[chosen_card] -= 1
 
-        if self.deck[card] == 0:
-            self.deck.pop(card)
+        if self.deck[chosen_card] == 0:
+            self.deck.pop(chosen_card)
+
+        if chosen_card[1] == "1":
+            self.players[sid]["drawn"] = 100
+        if chosen_card[1] == "5":
+            self.players[sid]["drawn"] = 500
+        if chosen_card[1] == "k":
+            self.players[sid]["drawn"] = 500
+        if chosen_card[1] == "a":
+            self.players[sid]["drawn"] = 1000
+        if chosen_card[1] == "j":
+            self.players[sid]["drawn"] = 2000
 
         self.is_payment_waiting = True
+
+    def pay(self, sid, **cards):
+        sid = str(sid)
+        turn_sid = self.order[self.turn]
+
+        if self.status < 1:
+            raise Exception("支払いできません")
+
+        if not self.is_payment_waiting:
+            raise Exception("支払いできません")
+
+        if turn_sid == sid:
+            raise ValueError("カードを引いたプレイヤーです")
+
+        for kind, num in cards.items():
+            if kind not in self.players[sid]["hand"]:
+                raise ValueError("持っていないカードがあります")
+            if self.players[sid]["hand"][kind] < num:
+                raise ValueError("枚数が足りません")
+
+        if cards == {}:
+            for kind in self.players[sid]["hand"]:
+                if kind[1] == "1":
+                    break
+            else:
+                raise ValueError("100円がありません")
+            cards = {kind: 1}
+
+        payment_amount = 0
+        for kind, num in cards.items():
+            if kind[1] == "1":
+                payment_amount += (100*num)
+            if kind[1] == "5":
+                payment_amount += (500*num)
+            if kind[1] == "k":
+                payment_amount += (500*num)
+            if kind[1] == "a":
+                payment_amount += (1000*num)
+            if kind[1] == "j":
+                payment_amount += (2000*num)
+
+        paid_amount = self.players[sid]["paid"]
+        drawn_amount = self.players[turn_sid]["drawn"]
+
+        if (payment_amount+paid_amount) > drawn_amount:
+            raise ValueError("金額が多すぎます")
+
+        for kind, num in cards.items():
+            self.players[sid]["hand"][kind] -= num
+            if self.players[sid]["hand"][kind] == 0:
+                self.players[sid]["hand"].pop(kind)
+            if kind in self.players[turn_sid]["hand"]:
+                self.players[turn_sid]["hand"][kind] = 0
+            self.players[turn_sid]["hand"][kind] += num
+            self.players[sid]["paid"] += payment_amount
+
+        count = 0
+        for key, value in self.players.items():
+            if key == turn_sid:
+                continue
+            if value["paid"] != self.players[turn_sid]["drawn"]:
+                count += 1
+
+        if count == 0:
+            for player in self.players.values():
+                player["drawn"] = 0
+                player["paid"] = 0
+            self.turn += 1
+            self.is_payment_waiting = False
+            if self.turn == len(self.order):
+                self.turn = 0
+                self.status += 1
