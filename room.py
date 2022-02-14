@@ -383,3 +383,55 @@ class Room:
             if self.turn == len(self.order):
                 self.turn = 0
                 self.status += 1
+
+    def repay(self, debtor, creditor, **cards):
+        debtor = str(debtor)
+        creditor = str(creditor)
+
+        if self.status < 1:
+            raise Exception("返済できません")
+
+        if debtor not in self.players[creditor]["debt"]:
+            raise ValueError("借金がありません")
+
+        if cards == {}:
+            raise ValueError("カードが指定されていません")
+
+        for kind, num in cards.items():
+            if kind not in self.players[debtor]["hand"]:
+                raise ValueError("持っていないカードがあります")
+            if self.players[debtor]["hand"][kind] < num:
+                raise ValueError("枚数が足りません")
+
+        amount = 0
+        for kind, num in cards.items():
+            if kind[1] == "1":
+                amount += (100*num)
+            if kind[1] == "5":
+                amount += (500*num)
+            if kind[1] == "k":
+                amount += (500*num)
+            if kind[1] == "a":
+                amount += (1000*num)
+            if kind[1] == "j":
+                amount += (2000*num)
+
+        if (amount%500) != 0:
+            raise ValueError("500で割り切れない金額です")
+
+        if self.players[debtor]["debt"][creditor] < amount:
+            raise ValueError("金額が多すぎます")
+
+        for kind, num in cards.items():
+            self.players[debtor]["hand"][kind] -= num
+            if self.players[debtor]["hand"][kind] == 0:
+                self.players[debtor]["hand"].pop(kind)
+            if kind not in self.players[creditor]["hand"]:
+                self.players[creditor]["hand"][kind] = 0
+            self.players[creditor]["hand"][kind] += num
+            self.players[debtor]["debt"][creditor] -= amount
+            if self.players[debtor]["debt"][creditor] == 0:
+                self.players[debtor]["debt"].pop(creditor)
+            self.players[creditor]["debtor"][debtor] += amount
+            if self.players[creditor]["debtor"][debtor] == 0:
+                self.players[creditor]["debtor"].pop(debtor)
