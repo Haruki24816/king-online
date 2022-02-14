@@ -306,10 +306,66 @@ class Room:
             self.players[sid]["hand"][kind] -= num
             if self.players[sid]["hand"][kind] == 0:
                 self.players[sid]["hand"].pop(kind)
-            if kind in self.players[turn_sid]["hand"]:
+            if kind not in self.players[turn_sid]["hand"]:
                 self.players[turn_sid]["hand"][kind] = 0
             self.players[turn_sid]["hand"][kind] += num
             self.players[sid]["paid"] += payment_amount
+
+        count = 0
+        for key, value in self.players.items():
+            if key == turn_sid:
+                continue
+            if value["paid"] != self.players[turn_sid]["drawn"]:
+                count += 1
+
+        if count == 0:
+            for player in self.players.values():
+                player["drawn"] = 0
+                player["paid"] = 0
+            self.turn += 1
+            self.is_payment_waiting = False
+            if self.turn == len(self.order):
+                self.turn = 0
+                self.status += 1
+
+    def borrow(self, sid, amount):
+        sid = str(sid)
+        amount = int(amount)
+        turn_sid = self.order[self.turn]
+
+        if self.status < 1:
+            raise Exception("借金できません")
+
+        if not self.is_payment_waiting:
+            raise Exception("借金できません")
+
+        if turn_sid == sid:
+            raise ValueError("カードを引いたプレイヤーです")
+
+        if amount not in (500, 1000, 1500, 2000):
+            raise ValueError("無効な値です")
+
+        paid_amount = self.players[sid]["paid"]
+        drawn_amount = self.players[turn_sid]["drawn"]
+
+        if (amount+paid_amount) > drawn_amount:
+            raise ValueError("金額が多すぎます")
+
+        if turn_sid not in self.players[sid]["debt"]:
+            self.players[sid]["debt"][turn_sid] = 0
+        self.players[sid]["debt"][turn_sid] += amount
+
+        if self.players[sid]["debt"][turn_sid] == 0:
+            self.players[sid]["debt"].pop(turn_sid)
+
+        if sid not in self.players[turn_sid]["debt"]:
+            self.players[turn_sid]["debt"][sid] = 0
+        self.players[turn_sid]["debt"][sid] -= amount
+
+        if self.players[turn_sid]["debt"][sid] == 0:
+            self.players[turn_sid]["debt"].pop(sid)
+
+        self.players[sid]["paid"] += amount
 
         count = 0
         for key, value in self.players.items():
