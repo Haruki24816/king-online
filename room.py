@@ -84,14 +84,16 @@ class Room:
         sid = str(sid)
         status = int(status)
 
-        if self.status != 0:
-            raise Exception("ゲーム進行中のため更新できません")
-
-        if self.players[sid]["name"] == "":
-            raise ValueError("このプレイヤーは名前が登録されていません")
-
-        if status not in (0, 1):
-            raise ValueError("無効な番号です")
+        if self.status == 0:
+            if self.players[sid]["name"] == "":
+                raise ValueError("このプレイヤーは名前が登録されていません")
+            if status not in (0, 1):
+                raise ValueError("無効な番号です")
+        elif self.status == -3:
+            if status != 0:
+                raise ValueError("無効な番号です")
+        else:
+            raise Exception("ステータスを更新できません")
 
         self.players[sid]["status"] = status
 
@@ -327,6 +329,14 @@ class Room:
             if self.turn == len(self.order):
                 self.turn = 0
                 self.status += 1
+            if len(self.deck) == 0:
+                self.status = -2
+                debt_count = 0
+                for player in self.players.values():
+                    if len(player["debt"]) != 0:
+                        debt_count += 1
+                if debt_count == 0:
+                    self.status = -3
 
     def borrow(self, sid, amount):
         sid = str(sid)
@@ -383,12 +393,20 @@ class Room:
             if self.turn == len(self.order):
                 self.turn = 0
                 self.status += 1
+            if len(self.deck) == 0:
+                self.status = -2
+                debt_count = 0
+                for player in self.players.values():
+                    if len(player["debt"]) != 0:
+                        debt_count += 1
+                if debt_count == 0:
+                    self.status = -3
 
     def repay(self, debtor, creditor, **cards):
         debtor = str(debtor)
         creditor = str(creditor)
 
-        if self.status < 1:
+        if not (self.status > 0 or self.status == -3):
             raise Exception("返済できません")
 
         if debtor not in self.players[creditor]["debt"]:
@@ -435,3 +453,11 @@ class Room:
             self.players[creditor]["debtor"][debtor] += amount
             if self.players[creditor]["debtor"][debtor] == 0:
                 self.players[creditor]["debtor"].pop(debtor)
+
+            debt_count = 0
+            for player in self.players.values():
+                if len(player["debt"]) != 0:
+                    debt_count += 1
+
+            if debt_count == 0:
+                self.status = -3
