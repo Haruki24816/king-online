@@ -131,27 +131,51 @@ class Cards:
         if self.have_bc(e=1):
             return "e"
 
+    def pay(self, *, a=0, b=0, c=0, d=0, e=0):
+        kwargs = {"a": a, "b": b, "c": c, "d": d, "e": e}
+        card_lists = {"a": [], "b": [], "c": [], "d": [], "e": []}
+        card_list = []
+        cards = {}
+
+        for kind, num in self.cards.items():
+            for n in range(num):
+                card_lists[kind[1]].append(kind)
+
+        for letter, num in kwargs.items():
+            card_list += random.sample(card_lists[letter], num)
+
+        for kind in card_list:
+            if kind not in cards:
+                cards[kid] = 0
+            cards[kind] += 1
+
+        self.remove(**cards)
+        return cards
+
 
 class Player:
 
     def __init__(self):
-        self.name = ""    #プレイヤー名
-        self.status = 0   #プレイヤーのステータス 未準備：0 準備完了：1 ゲーム中：2
-        self.hand = None  #手札 Cardsクラス
-        self.debts = None #借金 辞書
-        self.paid = None  #支払った額
+        self.name = ""      #プレイヤー名
+        self.status = 0     #プレイヤーのステータス 未準備：0 準備完了：1 ゲーム中：2
+        self.hand = None    #手札 Cardsクラス
+        self.debts = None   #借金 辞書
+        self.paid = None    #支払った額
+        self.changes = None #お釣り 辞書
 
     def prepare(self):
         self.status = 2
         self.hand = Cards()
-        self.debt = {}
+        self.debts = {}
         self.paid = 0
+        self.changes = {}
 
     def finish(self):
         self.status = 0
         self.hand = None
-        self.debt = None
+        self.debts = None
         self.paid = None
+        self.changes = None
 
     def debt(self, sid, amount):
         if sid not in self.debts:
@@ -397,3 +421,16 @@ class Room:
             add_condition(e=1)
 
         return conditions
+
+    def pay(self, sid, *, a=0, b=0, c=0, d=0, e=0):
+        kwargs = {"a": a, "b": b, "c": c, "d": d, "e": e}
+        player = self.players[sid]
+        turn_player = self.players[self.order[self.turn]]
+
+        if kwargs not in self.check_pay(sid):
+            raise ValueError("無効な値です")
+
+        paid = player.hand.pay(**kwargs)
+        turn_player.hand.add(**paid)
+
+        amount = Cards(**paid).amount()
