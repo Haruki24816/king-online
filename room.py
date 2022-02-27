@@ -258,8 +258,9 @@ class Room:
         if self.drawn != 0:
             raise Exception("カードを引けません")
 
-        if red < 0 or green < 0 or blue < 0:
-            raise ValueError("無効な値です")
+        for arg in (red, green, blue):
+            if arg < 0:
+                raise ValueError("無効な値です")
 
         if sid != self.order[self.turn]:
             raise ValueError("このプレイヤーの番ではありません")
@@ -282,3 +283,17 @@ class Room:
                 self.drawn = 1000
             if letter == "e":
                 self.drawn = 2000
+
+    def pay(self, sid, *, a=0, b=0, c=0, d=0, e=0):
+        if self.status < 1:
+            raise Exception("支払いできません")
+
+        if self.drawn == 0:
+            raise Exception("支払いできません")
+
+        if sid == self.order[self.turn]:
+            raise ValueError("順番のプレイヤーです")
+
+        for arg in (a, b, c, d, e):
+            if arg < 0:
+                raise ValueError("無効な値です")
