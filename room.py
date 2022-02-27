@@ -94,6 +94,43 @@ class Cards:
 
         return amount
 
+    def have(self, *, a=0, b=0, c=0, d=0, e=0):
+        for arg in (a, b, c, d, e):
+            if arg < 0:
+                raise ValueError("無効な値です")
+
+        nums = {"a": 0, "b": 0, "c": 0, "d": 0, "e": 0}
+
+        for kind, num in self.cards.items():
+            nums[kind[1]] += num
+
+        return nums["a"] >= a and nums["b"] >= b and nums["c"] >= c and nums["d"] >= d and nums["e"] >= e
+
+    def have_bc(self, *, a=0, bc=0, d=0, e=0):
+        for arg in (a, bc, d, e):
+            if arg < 0:
+                raise ValueError("無効な値です")
+
+        nums = {"a": 0, "bc": 0, "d": 0, "e": 0}
+
+        for kind, num in self.cards.items():
+            letter = kind[1]
+            if letter in ("b", "c"):
+                letter = "bc"
+            nums[letter] += num
+
+        return nums["a"] >= a and nums["bc"] >= bc and nums["d"] >= d and nums["e"] >= e
+
+    def min(self):
+        if self.have_bc(a=1):
+            return "a"
+        if self.have_bc(bc=1):
+            return "bc"
+        if self.have_bc(d=1):
+            return "d"
+        if self.have_bc(e=1):
+            return "e"
+
 
 class Player:
 
@@ -274,7 +311,7 @@ class Room:
                 self.turn = 0
                 self.status = 1
         else:
-            letter = drawn.keys()[0][1]
+            letter = list(drawn.keys())[0][1]
             if letter == "a":
                 self.drawn = 100
             if letter in ("b", "c"):
@@ -284,7 +321,7 @@ class Room:
             if letter == "e":
                 self.drawn = 2000
 
-    def pay(self, sid, *, a=0, b=0, c=0, d=0, e=0):
+    def check_pay(self, sid):
         if self.status < 1:
             raise Exception("支払いできません")
 
@@ -294,6 +331,69 @@ class Room:
         if sid == self.order[self.turn]:
             raise ValueError("順番のプレイヤーです")
 
-        for arg in (a, b, c, d, e):
-            if arg < 0:
-                raise ValueError("無効な値です")
+        if self.players[sid].paid == self.drawn:
+            raise ValueError("支払い済みです")
+
+        player = self.players[sid]
+        turn_player = self.players[self.order[self.turn]]
+        conditions = []
+        min = player.hand.min()
+        require = self.drawn - player.paid
+
+        def add_condition(*, a=0, bc=0, d=0, e=0):
+            kwargs = {"a": a, "bc": bc, "d": d, "e": e}
+            if player.hand.have_bc(**kwargs):
+                conditions.append(kwargs)
+
+        if require == 100:
+            add_condition(a=1)
+            if min == "bc" and turn_player.hand.have_bc(a=4):
+                conditions.append({"a": 0, "bc": 1, "d": 0, "e": 0})
+            if min == "d" and (turn_player.hand.have_bc(a=9) or turn_player.hand.have_bc(a=4, bc=1)):
+                conditions.append({"a": 0, "bc": 0, "d": 1, "e": 0})
+            if (min == "e" and (
+                turn_player.hand.have_bc(a=19) or
+                turn_player.hand.have_bc(a=14, bc=1) or
+                turn_player.hand.have_bc(a=9, bc=2) or
+                turn_player.hand.have_bc(a=4, bc=3) or
+                turn_player.hand.have_bc(a=9, d=1) or
+                turn_player.hand.have_bc(a=4, bc=1, d=1))):
+                conditions.append({"a": 0, "bc": 0, "d": 0, "e": 1})
+
+        if require == 500:
+            add_condition(a=5)
+            add_condition(bc=1)
+            if min == "d" and (turn_player.hand.have_bc(a=5) or turn_player.hand.have_bc(bc=1)):
+                conditions.append({"a": 0, "bc": 0, "d": 1, "e": 0})
+            if (min == "e" and (
+                turn_player.hand.have_bc(a=15) or
+                turn_player.hand.have_bc(a=10, bc=1) or
+                turn_player.hand.have_bc(a=5, bc=2) or
+                turn_player.hand.have_bc(bc=3))):
+                conditions.append({"a": 0, "bc": 0, "d": 0, "e": 1})
+
+        if require == 1000:
+            add_condition(a=10)
+            add_condition(a=5, bc=1)
+            add_condition(bc=2)
+            add_condition(d=1)
+            if (min == "e" and (
+                turn_player.hand.have_bc(a=10) or
+                turn_player.hand.have_bc(a=5, bc=1) or
+                turn_player.hand.have_bc(bc=2) or
+                turn_player.hand.have_bc(d=1))):
+                conditions.append({"a": 0, "bc": 0, "d": 0, "e": 1})
+
+        if require == 2000:
+            add_condition(a=20)
+            add_condition(a=15, bc=1)
+            add_condition(a=10, bc=2)
+            add_condition(a=5, bc=3)
+            add_condition(bc=4)
+            add_condition(a=10, d=1)
+            add_condition(a=5, bc=1, d=1)
+            add_condition(bc=2, d=1)
+            add_condition(d=2)
+            add_condition(e=1)
+
+        return conditions
