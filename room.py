@@ -1,158 +1,161 @@
 import random
 
 
-class Cards:
+class Cards(dict):
 
-    def __init__(self, **cards):
-        self.check(cards)
-        self.cards = cards
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-    def check(self, cards):
-        for kind, num in cards.items():
-            if (len(kind) != 2 or
-                kind[0] not in ("r", "g", "b") or
-                kind[1] not in ("a", "b", "c", "d", "e")):
+        for key, value in self.items():
+            if len(key) != 2 or \
+               key[0] not in ("r", "g", "b") or \
+               key[1] not in ("a", "b", "c", "d", "e"):
                 raise ValueError("無効な種類のカードが指定されています")
-            if num < 1:
+            if value < 1:
                 raise ValueError("無効な枚数が指定されています")
 
-    def add(self, **cards):
-        self.check(cards)
+    def add(self, cards):
+        if not type(cards) == type(self):
+            raise ValueError("Cardsクラスではありません")
 
         for kind, num in cards.items():
-            if kind not in self.cards:
-                self.cards[kind] = 0
-            self.cards[kind] += num
+            if kind not in self:
+                self[kind] = 0
+            self[kind] += num
 
-    def remove(self, **cards):
-        self.check(cards)
+    def remove(self, cards):
+        if not type(cards) == type(self):
+            raise ValueError("Cardsクラスではありません")
 
-        for kind, num in cards.items():
-            if kind not in self.cards:
-                raise ValueError("存在しないカードが指定されています")
-            if self.cards[kind] < num:
-                raise ValueError("枚数が多すぎます")
+        if not self.is_contained(cards):
+            raise ValueError("指定されたカードは含まれていません")
 
         for kind, num in cards.items():
-            self.cards[kind] -= num
-            if self.cards[kind] == 0:
-                self.cards.pop(kind)
+            self[kind] -= num
+            if self[kind] == 0:
+                self.pop(kind)
 
-    def draw(self, *, red=0, green=0, blue=0):
-        red_card_list, green_card_list, blue_card_list = [], [], []
+    def is_contained(self, cards):
+        if not type(cards) == type(self):
+            raise ValueError("Cardsクラスではありません")
 
-        for kind, num in self.cards.items():
-            if kind[0] == "r":
-                for n in range(num):
-                    red_card_list.append(kind)
-            if kind[0] == "g":
-                for n in range(num):
-                    green_card_list.append(kind)
-            if kind[0] == "b":
-                for n in range(num):
-                    blue_card_list.append(kind)
+        for kind, num in cards.items():
+            if (kind not in self) or (self[kind] < num):
+                return False
 
-        card_list = []
-        card_list += random.sample(red_card_list, red)
-        card_list += random.sample(green_card_list, green)
-        card_list += random.sample(blue_card_list, blue)
+        return True
 
-        cards = {}
-
-        for kind in card_list:
-            if kind not in cards:
-                cards[kind] = 0
-            cards[kind] += 1
-
-        self.remove(**cards)
-        return cards
-
-    def card_num(self):
-        red_num, green_num, blue_num = 0, 0, 0
-
-        for kind, num in self.cards.items():
-            if kind[0] == "r":
-                red_num += num
-            if kind[0] == "g":
-                green_num += num
-            if kind[0] == "b":
-                blue_num += num
-
-        return {"r": red_num, "g": green_num, "b": blue_num}
-
-    def amount(self, king=False):
-        card_value = {"a": 100, "b": 500, "c": 500, "d": 1000, "e": 2000}
-        amount = 0
-
-        if king:
-            card_value["c"] = -2000
-
-        for kind, num in self.cards.items():
-            for letter, value in card_value.items():
-                if kind[1] == letter:
-                    amount += value * num
-
-        return amount
-
-    def have(self, *, a=0, b=0, c=0, d=0, e=0):
-        for arg in (a, b, c, d, e):
-            if arg < 0:
+    def check_abcde_nums(self, a=0, b=0, c=0, d=0, e=0, bc=0):
+        for num in (a, b, c, d, e, bc):
+            if num < 0:
                 raise ValueError("無効な値です")
 
-        nums = {"a": 0, "b": 0, "c": 0, "d": 0, "e": 0}
+        nums = self.count_abcde()
 
-        for kind, num in self.cards.items():
-            nums[kind[1]] += num
+        if bc != 0 and b+c == 0:
+            return nums["a"] >= a and (nums["b"]+nums["c"]) >= bc and nums["d"] >= d and nums["e"] >= e
+        elif bc == 0 and b+c != 0:
+            return nums["a"] >= a and nums["b"] >= b and nums["c"] >= c and nums["d"] >= d and nums["e"] >= e
+        elif bc == 0 and b+c == 0:
+            return nums["a"] >= a and nums["d"] >= d and nums["e"] >= e
+        else:
+            raise ValueError("無効な値です")
 
-        return nums["a"] >= a and nums["b"] >= b and nums["c"] >= c and nums["d"] >= d and nums["e"] >= e
-
-    def have_bc(self, *, a=0, bc=0, d=0, e=0):
-        for arg in (a, bc, d, e):
-            if arg < 0:
-                raise ValueError("無効な値です")
-
-        nums = {"a": 0, "bc": 0, "d": 0, "e": 0}
-
-        for kind, num in self.cards.items():
-            letter = kind[1]
-            if letter in ("b", "c"):
-                letter = "bc"
-            nums[letter] += num
-
-        return nums["a"] >= a and nums["bc"] >= bc and nums["d"] >= d and nums["e"] >= e
-
-    def min(self):
-        if self.have_bc(a=1):
-            return "a"
-        if self.have_bc(bc=1):
-            return "bc"
-        if self.have_bc(d=1):
-            return "d"
-        if self.have_bc(e=1):
-            return "e"
-
-    def pay(self, *, a=0, b=0, c=0, d=0, e=0):
-        kwargs = {"a": a, "b": b, "c": c, "d": d, "e": e}
+    def categorize_to_abcde(self):
         card_lists = {"a": [], "b": [], "c": [], "d": [], "e": []}
-        card_list = []
-        cards = {}
 
-        for kind, num in self.cards.items():
+        for kind, num in self.items():
             for n in range(num):
                 card_lists[kind[1]].append(kind)
 
-        for letter, num in kwargs.items():
-            card_list += random.sample(card_lists[letter], num)
+        return card_lists
+
+    def categorize_to_rgb(self):
+        card_lists = {"r": [], "g": [], "b": []}
+
+        for kind, num in self.items():
+            for n in range(num):
+                card_lists[kind[0]].append(kind)
+
+        return card_lists
+
+    def draw(self, *, r=0, g=0, b=0):
+        card_list = []
+        categorized_cards = self.categorize_to_rgb()
+        drawn_cards = {}
+
+        for letter, num in {"r": r, "g": g, "b": b}.items():
+            card_list += random.sample(categorized_cards[letter], num)
 
         for kind in card_list:
-            if kind not in cards:
-                cards[kid] = 0
-            cards[kind] += 1
+            if kind not in drawn_cards:
+                drawn_cards[kind] = 0
+            drawn_cards[kind] += 1
 
-        self.remove(**cards)
+        cards = Cards(drawn_cards)
+        self.remove(cards)
         return cards
 
-    def check_pay(self, amount, opponent_cards):
+    def pay(self, *, a=0, b=0, c=0, d=0, e=0):
+        card_list = []
+        categorized_cards = self.categorize_to_abcde()
+        paid_cards = {}
+
+        for letter, num in {"a": a, "b": b, "c": c, "d": d, "e": e}.items():
+            card_list += random.sample(categorized_cards[letter], num)
+
+        for kind in card_list:
+            if kind not in paid_cards:
+                paid_cards[kind] = 0
+            paid_cards[kind] += 1
+
+        cards = Cards(paid_cards)
+        self.remove(cards)
+        return cards
+
+    def count_abcde(self):
+        nums = {"a": 0, "b": 0, "c": 0, "d": 0, "e": 0}
+
+        for letter, card_list in self.categorize_to_abcde().items():
+            nums[letter] = len(card_list)
+
+        return nums
+
+    def count_rgb(self):
+        nums = {"r": 0, "g": 0, "b": 0}
+
+        for letter, card_list in self.categorize_to_rgb().items():
+            nums[letter] = len(card_list)
+
+        return nums
+
+    def min(self):
+        if self.check_abcde_nums(a=1):
+            return "a"
+        if self.check_abcde_nums(bc=1):
+            return "bc"
+        if self.check_abcde_nums(d=1):
+            return "d"
+        if self.check_abcde_nums(e=1):
+            return "e"
+
+    def amount(self, king=False):
+        card_values = {"a": 100, "b": 500, "c": 500, "d": 1000, "e": 2000}
+        nums = self.count_abcde()
+        amount = 0
+
+        if king:
+            card_values["c"] = -2000
+
+        for letter in card_values:
+            amount += card_values[letter] * nums[letter]
+
+        return amount
+
+    def payments(self, amount, cards):
+        if not type(cards) == type(self):
+            raise ValueError("Cardsクラスではありません")
+
         conditions = []
         min = self.min()
 
@@ -160,76 +163,55 @@ class Cards:
             conditions.append({"a": a, "bc": bc, "d": d, "e": e})
 
         if amount == 100:
-            if self.have_bc(a=1):
-                add_condition(a=1)
-            if min == 500 and opponent_cards.have_bc(a=4):
+            if self.check_abcde_nums(a=1): add_condition(a=1)
+            if min == "bc" and cards.check_abcde_nums(a=4):
                 add_condition(bc=1)
-            if min == 1000 and (\
-               opponent_cards.have_bc(a=9) or\
-               opponent_cards.have_bc(a=4, bc=1)):
+            if min == "d" and (cards.check_abcde_nums(a=9) or cards.check_abcde_nums(a=4, bc=1)):
                 add_condition(d=1)
-            if min == 2000 and (\
-               opponent_cards.have_bc(a=19) or\
-               opponent_cards.have_bc(a=14, bc=1) or\
-               opponent_cards.have_bc(a=9, bc=2) or\
-               opponent_cards.have_bc(a=4, bc=3) or\
-               opponent_cards.have_bc(a=9, d=1) or\
-               opponent_cards.have_bc(a=4, bc=1, d=1)):
+            if min == "e" and ( \
+               cards.check_abcde_nums(a=19) or \
+               cards.check_abcde_nums(a=14, bc=1) or \
+               cards.check_abcde_nums(a=9, bc=2) or \
+               cards.check_abcde_nums(a=4, bc=3) or \
+               cards.check_abcde_nums(a=9, d=1) or \
+               cards.check_abcde_nums(a=4, bc=1, d=1)):
                 add_condition(e=1)
 
         elif amount == 500:
-            if self.have_bc(a=5):
-                add_condition(a=5)
-            if self.have_bc(bc=1):
-                add_condition(bc=1)
-            if min == 1000 and (\
-               opponent_cards.have_bc(a=5) or\
-               opponent_cards.have_bc(bc=1)):
+            if self.check_abcde_nums(a=5):  add_condition(a=5)
+            if self.check_abcde_nums(bc=1): add_condition(bc=1)
+            if min == "d" and (cards.check_abcde_nums(a=5) or cards.check_abcde_nums(bc=1)):
                 add_condition(d=1)
-            if min == 2000 and (\
-               opponent_cards.have_bc(a=10) or\
-               opponent_cards.have_bc(a=5, bc=1) or\
-               opponent_cards.have_bc(bc=2) or\
-               opponent_cards.have_bc(d=1)):
+            if min == "e" and ( \
+               cards.check_abcde_nums(a=10) or \
+               cards.check_abcde_nums(a=5, bc=1) or \
+               cards.check_abcde_nums(bc=2) or \
+               cards.check_abcde_nums(d=1)):
                 add_condition(e=1)
 
         elif amount == 1000:
-            if self.have_bc(a=10):
-                add_condition(a=10)
-            if self.have_bc(a=5, bc=1):
-                add_condition(a=5, bc=1)
-            if self.have_bc(bc=2):
-                add_condition(bc=2)
-            if self.have_bc(d=1):
-                add_condition(d=1)
-            if min == 2000 and (\
-               opponent_cards.have_bc(a=10) or\
-               opponent_cards.have_bc(a=5, bc=1) or\
-               opponent_cards.have_bc(bc=2) or\
-               opponent_cards.have_bc(d=1)):
+            if self.check_abcde_nums(a=10):      add_condition(a=10)
+            if self.check_abcde_nums(a=5, bc=1): add_condition(a=5, bc=1)
+            if self.check_abcde_nums(bc=2):      add_condition(bc=2)
+            if self.check_abcde_nums(d=1):       add_condition(d=1)
+            if min == "e" and ( \
+               cards.check_abcde_nums(a=10) or \
+               cards.check_abcde_nums(a=5, bc=1) or \
+               cards.check_abcde_nums(bc=2) or \
+               cards.check_abcde_nums(d=1)):
                 add_condition(e=1)
 
         elif amount == 2000:
-            if self.have_bc(a=20):
-                add_condition(a=20)
-            if self.have_bc(a=15, bc=1):
-                add_condition(a=15, bc=1)
-            if self.have_bc(a=10, bc=2):
-                add_condition(a=10, bc=2)
-            if self.have_bc(a=5, bc=3):
-                add_condition(a=5, bc=3)
-            if self.have_bc(bc=4):
-                add_condition(bc=4)
-            if self.have_bc(a=10, d=1):
-                add_condition(a=10, d=1)
-            if self.have_bc(a=5, bc=1, d=1):
-                add_condition(a=5, bc=1, d=1)
-            if self.have_bc(bc=2, d=1):
-                add_condition(bc=2, d=1)
-            if self.have_bc(d=2):
-                add_condition(d=2)
-            if self.have_bc(e=1):
-                add_condition(e=1)
+            if self.check_abcde_nums(a=20):           add_condition(a=20)
+            if self.check_abcde_nums(a=15, bc=1):     add_condition(a=15, bc=1)
+            if self.check_abcde_nums(a=10, bc=2):     add_condition(a=10, bc=2)
+            if self.check_abcde_nums(a=5, bc=3):      add_condition(a=5, bc=3)
+            if self.check_abcde_nums(bc=4):           add_condition(bc=4)
+            if self.check_abcde_nums(a=10, d=1):      add_condition(a=10, d=1)
+            if self.check_abcde_nums(a=5, bc=1, d=1): add_condition(a=5, bc=1, d=1)
+            if self.check_abcde_nums(bc=2, d=1):      add_condition(bc=2, d=1)
+            if self.check_abcde_nums(d=2):            add_condition(d=2)
+            if self.check_abcde_nums(e=1):            add_condition(e=1)
 
         else:
             raise ValueError("無効な値です")
@@ -390,12 +372,12 @@ class Room:
         self.turn = None
         self.drawn = None
 
-    def draw(self, sid, *, red=0, green=0, blue=0):
+    def draw(self, sid, *, r=0, g=0, b=0):
         if self.status == -1:
-            if (red+green+blue) != 15:
+            if (r+g+b) != 15:
                 raise ValueError("無効な値です")
         elif self.status > 0:
-            if (red+green+blue) != 1:
+            if (r+g+b) != 1:
                 raise ValueError("無効な値です")
         else:
             raise Exception("カードを引けません")
@@ -403,15 +385,15 @@ class Room:
         if self.drawn != 0:
             raise Exception("カードを引けません")
 
-        for arg in (red, green, blue):
+        for arg in (r, g, b):
             if arg < 0:
                 raise ValueError("無効な値です")
 
         if sid != self.order[self.turn]:
             raise ValueError("このプレイヤーの番ではありません")
 
-        drawn = self.deck.draw(red=red, green=green, blue=blue)
-        self.players[sid].hand.add(**drawn)
+        drawn = self.deck.draw(r=r, g=g, b=b)
+        self.players[sid].hand.add(drawn)
 
         if self.status == -1:
             self.turn += 1
