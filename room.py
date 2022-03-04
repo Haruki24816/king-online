@@ -152,72 +152,6 @@ class Cards(dict):
 
         return amount
 
-    def payments(self, amount, cards):
-        if not type(cards) == type(self):
-            raise ValueError("Cardsクラスではありません")
-
-        conditions = []
-        min = self.min()
-
-        def add_condition(*, a=0, bc=0, d=0, e=0):
-            conditions.append({"a": a, "bc": bc, "d": d, "e": e})
-
-        if amount == 100:
-            if self.check_abcde_nums(a=1): add_condition(a=1)
-            if min == "bc" and cards.check_abcde_nums(a=4):
-                add_condition(bc=1)
-            if min == "d" and (cards.check_abcde_nums(a=9) or cards.check_abcde_nums(a=4, bc=1)):
-                add_condition(d=1)
-            if min == "e" and ( \
-               cards.check_abcde_nums(a=19) or \
-               cards.check_abcde_nums(a=14, bc=1) or \
-               cards.check_abcde_nums(a=9, bc=2) or \
-               cards.check_abcde_nums(a=4, bc=3) or \
-               cards.check_abcde_nums(a=9, d=1) or \
-               cards.check_abcde_nums(a=4, bc=1, d=1)):
-                add_condition(e=1)
-
-        elif amount == 500:
-            if self.check_abcde_nums(a=5):  add_condition(a=5)
-            if self.check_abcde_nums(bc=1): add_condition(bc=1)
-            if min == "d" and (cards.check_abcde_nums(a=5) or cards.check_abcde_nums(bc=1)):
-                add_condition(d=1)
-            if min == "e" and ( \
-               cards.check_abcde_nums(a=10) or \
-               cards.check_abcde_nums(a=5, bc=1) or \
-               cards.check_abcde_nums(bc=2) or \
-               cards.check_abcde_nums(d=1)):
-                add_condition(e=1)
-
-        elif amount == 1000:
-            if self.check_abcde_nums(a=10):      add_condition(a=10)
-            if self.check_abcde_nums(a=5, bc=1): add_condition(a=5, bc=1)
-            if self.check_abcde_nums(bc=2):      add_condition(bc=2)
-            if self.check_abcde_nums(d=1):       add_condition(d=1)
-            if min == "e" and ( \
-               cards.check_abcde_nums(a=10) or \
-               cards.check_abcde_nums(a=5, bc=1) or \
-               cards.check_abcde_nums(bc=2) or \
-               cards.check_abcde_nums(d=1)):
-                add_condition(e=1)
-
-        elif amount == 2000:
-            if self.check_abcde_nums(a=20):           add_condition(a=20)
-            if self.check_abcde_nums(a=15, bc=1):     add_condition(a=15, bc=1)
-            if self.check_abcde_nums(a=10, bc=2):     add_condition(a=10, bc=2)
-            if self.check_abcde_nums(a=5, bc=3):      add_condition(a=5, bc=3)
-            if self.check_abcde_nums(bc=4):           add_condition(bc=4)
-            if self.check_abcde_nums(a=10, d=1):      add_condition(a=10, d=1)
-            if self.check_abcde_nums(a=5, bc=1, d=1): add_condition(a=5, bc=1, d=1)
-            if self.check_abcde_nums(bc=2, d=1):      add_condition(bc=2, d=1)
-            if self.check_abcde_nums(d=2):            add_condition(d=2)
-            if self.check_abcde_nums(e=1):            add_condition(e=1)
-
-        else:
-            raise ValueError("無効な値です")
-
-        return conditions
-
 
 class Player:
 
@@ -410,3 +344,85 @@ class Room:
                 self.drawn = 1000
             if letter == "e":
                 self.drawn = 2000
+
+    def pay(self, sid, *, a=0, b=0, c=0, d=0, e=0):
+        nums = {"a": a, "b": b, "c": c, "d": d, "e": e}
+        player = self.players[sid]
+        turn_player = self.players[self.order[self.turn]]
+        difference = self.drawn - player.paid
+
+        if self.status < 1:
+            raise Exception("支払いできません")
+
+        if self.drawn == 0:
+            raise Exception("支払いできません")
+
+        if sid == self.order[self.turn]:
+            raise ValueError("順番のプレイヤーです")
+
+        if player.paid == self.drawn:
+            raise ValueError("支払い済みです")
+
+        if not check_abcde_nums(**nums):
+            raise ValueError("持っていないカードが指定されています")
+
+        amount = 0
+
+        for letter, value in {"a": 100, "b": 500, "c": 500, "d": 1000, "e": 2000}.items():
+            amount += value * nums[letter]
+
+        change = False
+
+        if difference == 100:
+            condition = {}
+            if player.hand.min() == 100:
+                condition = {"a": 1, "bc": 0, "d": 0, "e": 0}
+            if player.hand.min() == 500 and \
+               turn_player.hand.check_abcde_nums(a=4):
+                condition = {"a": 0, "bc": 1, "d": 0, "e": 0}
+                change = True
+            if player.hand.min() == 1000 and (\
+               turn_player.hand.check_abcde_nums(a=9) or \
+               turn_player.hand.check_abcde_nums(a=4, bc=1)):
+                condition = {"a": 0, "bc": 0, "d": 1, "e": 0}
+                change = True
+            if player.hand.min() == 2000 and (\
+               turn_player.hand.check_abcde_nums(a=19) or \
+               turn_player.hand.check_abcde_nums(a=14, bc=1) or \
+               turn_player.hand.check_abcde_nums(a=9, bc=2) or \
+               turn_player.hand.check_abcde_nums(a=4, bc=3) or \
+               turn_player.hand.check_abcde_nums(a=9, d=1) or \
+               turn_player.hand.check_abcde_nums(a=4, bc=1, d=1)):
+                condition = {"a": 0, "bc": 0, "d": 0, "e": 1}
+                change = True
+            if {"a": a, "bc": b+c, "d": d, "e": e} != condition:
+                raise ValueError("無効な値です")
+        else:
+            if (amount%500) != 0:
+                raise ValueError("無効な値です")
+            if amount > difference:
+                raise ValueError("無効な値です")
+
+        paid = player.hand.pay(**nums)
+        turn_player.hand.add(paid)
+
+        if change:
+            turn_player.changes[sid] = paid.amount - 100
+            player.paid = 100
+        else:
+            player.paid += paid.amount
+
+        player_count = 0
+        for player in self.players.values():
+            if not player.paid == self.drawn:
+                player_count += 1
+
+        if player_count == 1 and len(turn_player.changes) == 0:
+            self.turn += 1
+
+        if self.turn == len(self.order):
+            self.turn = 0
+            self.status += 1
+            self.drawn = 0
+            for player in self.players.values():
+                players.paid = 0
