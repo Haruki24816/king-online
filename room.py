@@ -397,6 +397,10 @@ class Room:
         if player.paid == self.drawn:
             raise ValueError("支払い済みです")
 
+        for num in (a, b, c, d, e):
+            if num < 0:
+                raise ValueError("無効な値です")
+
         if not player.hand.can_pay(self.drawn-player.paid, turn_player.hand, a=a, bc=b+c, d=d, e=e):
             raise ValueError("無効な値です")
 
@@ -407,7 +411,7 @@ class Room:
             turn_player.changes[sid] = paid.amount() - 100
             player.paid = 100
         else:
-            player.paid = paid.amount()
+            player.paid += paid.amount()
 
         try:
             self.next_turn()
@@ -457,7 +461,12 @@ class Room:
         if opponent_sid not in player.changes:
             raise ValueError("お釣りは要りません")
 
+        for num in (a, b, c, d, e):
+            if num < 0:
+                raise ValueError("無効な値です")
+
         amount = 0
+
         for letter, value in {"a": 100, "bc": 500, "d": 1000, "e": 2000}.items():
             amount += value * {"a": a, "bc": b+c, "d": d, "e": e}[letter]
 
@@ -472,3 +481,61 @@ class Room:
             self.next_turn()
         except Exception:
             pass
+
+    def borrow(self, sid, amount):
+        player = self.players[sid]
+        turn_player = self.players[self.order[self.turn]]
+
+        if self.status < 1:
+            raise Exception("借金できません")
+
+        if self.drawn == 0:
+            raise Exception("借金できません")
+
+        if sid == self.order[self.turn]:
+            raise ValueError("順番のプレイヤーです")
+
+        if amount not in (500, 1000, 1500, 2000):
+            raise ValueError("無効な値です")
+
+        if (self.drawn-player.paid) < amount:
+            raise ValueError("金額が多すぎます")
+
+        player.debt(self.order[self.turn], amount)
+        turn_player.debt(sid, (amount*-1))
+        player.paid += amount
+
+        try:
+            self.next_turn()
+        except Exception:
+            pass
+
+    def repay(self, sid, opponent_sid, *, a=0, b=0, c=0, d=0, e=0):
+        player = self.players[sid]
+        opponent_player = self.players[opponent_sid]
+
+        if not (self.status > 0 or self.status == -3):
+            raise Exception("返済できません")
+
+        if opponent_sid not in player.debts:
+            raise ValueError("借金がありません")
+
+        for num in (a, b, c, d, e):
+            if num < 0:
+                raise ValueError("無効な値です")
+
+        amount = 0
+
+        for letter, value in {"a": 100, "bc": 500, "d": 1000, "e": 2000}.items():
+            amount += value * {"a": a, "bc": b+c, "d": d, "e": e}[letter]
+
+        if amount > player.debts[opponent_sid]:
+            raise ValueError("金額が多すぎます")
+
+        if (amount%500) != 0:
+            raise ValueError("無効な値です")
+
+        paid = player.hand.pay(a=a, b=b, c=c, d=d, e=e)
+        opponent_player.hand.add(paid)
+        player.debt(opponent_sid, (amount*-1))
+        opponent_player.debt(sid, amount)
