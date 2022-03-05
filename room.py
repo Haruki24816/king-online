@@ -139,7 +139,7 @@ class Cards(dict):
         if self.check_abcde_nums(e=1):
             return "e"
 
-    def amount(self, king=False):
+    def amount(self, *, king=False):
         card_values = {"a": 100, "b": 500, "c": 500, "d": 1000, "e": 2000}
         nums = self.count_abcde()
         amount = 0
@@ -203,6 +203,7 @@ class Player:
         self.name = ""      #プレイヤー名
         self.status = 0     #プレイヤーのステータス 未準備：0 準備完了：1 ゲーム中：2
         self.hand = None    #手札 Cardsクラス
+        self.temp = None    #返済待ちのときに返済されたもの Cardsクラス
         self.debts = None   #借金 辞書
         self.paid = None    #支払った額
         self.changes = None #お釣り 辞書
@@ -210,6 +211,7 @@ class Player:
     def prepare(self):
         self.status = 2
         self.hand = Cards()
+        self.temp = Cards()
         self.debts = {}
         self.paid = 0
         self.changes = {}
@@ -217,6 +219,7 @@ class Player:
     def finish(self):
         self.status = 0
         self.hand = None
+        self.temp = None
         self.debts = None
         self.paid = None
         self.changes = None
@@ -310,6 +313,11 @@ class Room:
         except Exception:
             pass
 
+        try:
+            self.finish()
+        except Exception:
+            pass
+
     def prepare(self):
         if self.status != 0:
             raise Exception("準備できません")
@@ -337,9 +345,16 @@ class Room:
         self.turn = 0
         self.drawn = 0
 
-    def finish(self):
+    def finish(self, *, force=False):
         if self.status == 0:
             raise Exception("終了できません")
+
+        if not force:
+            if self.status != -3:
+                raise Exception("終了できません")
+            for player in self.players.values():
+                if player.status == 2:
+                    raise Exception("ゲームを終了していないプレイヤーがいます")
 
         for player in self.players.values():
             player.finish()
@@ -438,7 +453,19 @@ class Room:
 
         self.turn += 1
 
-        if self.turn == len(self.order):
+        if len(self.deck) == 0:
+            self.status = -2
+            self.turn = 0
+            self.drawn = 0
+            for player in self.players.values():
+                player.paid = 0
+            for player in self.players.values():
+                if len(player.debts) != 0:
+                    break
+            else:
+                self.status = -3
+
+        elif self.turn == len(self.order):
             self.turn = 0
             self.status += 1
             self.drawn = 0
@@ -514,7 +541,7 @@ class Room:
         player = self.players[sid]
         opponent_player = self.players[opponent_sid]
 
-        if not (self.status > 0 or self.status == -3):
+        if not (self.status > 0 or self.status == -2):
             raise Exception("返済できません")
 
         if opponent_sid not in player.debts:
@@ -535,7 +562,22 @@ class Room:
         if (amount%500) != 0:
             raise ValueError("無効な値です")
 
+        if self.status == -2:
+            opponent_player_hand = opponent_player.temp
+        else:
+            opponent_player_hand = opponent_player.hand
+
         paid = player.hand.pay(a=a, b=b, c=c, d=d, e=e)
-        opponent_player.hand.add(paid)
+        opponent_player_hand.add(paid)
         player.debt(opponent_sid, (amount*-1))
         opponent_player.debt(sid, amount)
+
+        if self.status == -2:
+            for p in self.players.values():
+                if len(p.debts) != 0:
+                    break
+            else:
+                for p in self.players.values():
+                    p.hand.add(player.temp)
+                    p.temp.clear()
+                self.status = -3
