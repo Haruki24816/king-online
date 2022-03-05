@@ -15,7 +15,7 @@ class Cards(dict):
                 raise ValueError("無効な枚数が指定されています")
 
     def add(self, cards):
-        if not type(cards) == type(self):
+        if type(cards) != type(self):
             raise ValueError("Cardsクラスではありません")
 
         for kind, num in cards.items():
@@ -24,7 +24,7 @@ class Cards(dict):
             self[kind] += num
 
     def remove(self, cards):
-        if not type(cards) == type(self):
+        if type(cards) != type(self):
             raise ValueError("Cardsクラスではありません")
 
         if not self.is_contained(cards):
@@ -36,7 +36,7 @@ class Cards(dict):
                 self.pop(kind)
 
     def is_contained(self, cards):
-        if not type(cards) == type(self):
+        if type(cards) != type(self):
             raise ValueError("Cardsクラスではありません")
 
         for kind, num in cards.items():
@@ -152,6 +152,50 @@ class Cards(dict):
 
         return amount
 
+    def can_pay(self, amount, cards, a=0, bc=0, d=0, e=0):
+        if type(cards) != type(self):
+            raise ValueError("Cardsクラスではありません")
+
+        nums = {"a": a, "bc": b+c, "d": d, "e": e}
+
+        if amount == 100:
+            condition = {}
+            if self.min() == 100:
+                condition = {"a": 1, "bc": 0, "d": 0, "e": 0}
+            if self.min() == 500 and \
+               cards.check_abcde_nums(a=4):
+                condition = {"a": 0, "bc": 1, "d": 0, "e": 0}
+            if self.min() == 1000 and (\
+               cards.check_abcde_nums(a=9) or \
+               cards.check_abcde_nums(a=4, bc=1)):
+                condition = {"a": 0, "bc": 0, "d": 1, "e": 0}
+            if self.min() == 2000 and (\
+               cards.check_abcde_nums(a=19) or \
+               cards.check_abcde_nums(a=14, bc=1) or \
+               cards.check_abcde_nums(a=9, bc=2) or \
+               cards.check_abcde_nums(a=4, bc=3) or \
+               cards.check_abcde_nums(a=9, d=1) or \
+               cards.check_abcde_nums(a=4, bc=1, d=1)):
+                condition = {"a": 0, "bc": 0, "d": 0, "e": 1}
+            if nums != condition:
+                return False
+
+        elif amount in (500, 1000, 1500, 2000):
+            if not self.check_abcde_nums(**nums):
+                return False
+            payment_amount = 0
+            for letter, value in {"a": 100, "bc": 500, "d": 1000, "e": 2000}.items():
+                payment_amount += value * nums[letter]
+            if (payment_amount%500) != 0:
+                return False
+            if payment_amount > amount:
+                return False
+
+        else:
+            raise ValueError("無効な値です")
+
+        return True
+
 
 class Player:
 
@@ -194,7 +238,7 @@ class Room:
             name = "名前のない部屋"
 
         self.name = name  #部屋の名前
-        self.status = 0   #部屋のステータス 募集中：0 準備中：-1 返済待ち：-2 ゲーム終了時：-3 ゲーム中：1以上（週数）
+        self.status = 0   #部屋のステータス 募集中：0 準備中：-1 返済待ち：-2 ゲーム終了時：-3 ゲーム中：1以上（周数）
         self.players = {} #プレイヤー情報
 
         self.deck = None  #山札 Cardsクラス
@@ -335,21 +379,11 @@ class Room:
                 self.turn = 0
                 self.status = 1
         else:
-            letter = list(drawn.keys())[0][1]
-            if letter == "a":
-                self.drawn = 100
-            if letter in ("b", "c"):
-                self.drawn = 500
-            if letter == "d":
-                self.drawn = 1000
-            if letter == "e":
-                self.drawn = 2000
+            self.drawn = drawn.amount()
 
     def pay(self, sid, *, a=0, b=0, c=0, d=0, e=0):
-        nums = {"a": a, "b": b, "c": c, "d": d, "e": e}
         player = self.players[sid]
         turn_player = self.players[self.order[self.turn]]
-        difference = self.drawn - player.paid
 
         if self.status < 1:
             raise Exception("支払いできません")
@@ -363,66 +397,78 @@ class Room:
         if player.paid == self.drawn:
             raise ValueError("支払い済みです")
 
-        if not check_abcde_nums(**nums):
-            raise ValueError("持っていないカードが指定されています")
+        if not player.hand.can_pay(self.drawn-player.paid, turn_player.hand, a=a, bc=b+c, d=d, e=e):
+            raise ValueError("無効な値です")
 
-        amount = 0
-
-        for letter, value in {"a": 100, "b": 500, "c": 500, "d": 1000, "e": 2000}.items():
-            amount += value * nums[letter]
-
-        change = False
-
-        if difference == 100:
-            condition = {}
-            if player.hand.min() == 100:
-                condition = {"a": 1, "bc": 0, "d": 0, "e": 0}
-            if player.hand.min() == 500 and \
-               turn_player.hand.check_abcde_nums(a=4):
-                condition = {"a": 0, "bc": 1, "d": 0, "e": 0}
-                change = True
-            if player.hand.min() == 1000 and (\
-               turn_player.hand.check_abcde_nums(a=9) or \
-               turn_player.hand.check_abcde_nums(a=4, bc=1)):
-                condition = {"a": 0, "bc": 0, "d": 1, "e": 0}
-                change = True
-            if player.hand.min() == 2000 and (\
-               turn_player.hand.check_abcde_nums(a=19) or \
-               turn_player.hand.check_abcde_nums(a=14, bc=1) or \
-               turn_player.hand.check_abcde_nums(a=9, bc=2) or \
-               turn_player.hand.check_abcde_nums(a=4, bc=3) or \
-               turn_player.hand.check_abcde_nums(a=9, d=1) or \
-               turn_player.hand.check_abcde_nums(a=4, bc=1, d=1)):
-                condition = {"a": 0, "bc": 0, "d": 0, "e": 1}
-                change = True
-            if {"a": a, "bc": b+c, "d": d, "e": e} != condition:
-                raise ValueError("無効な値です")
-        else:
-            if (amount%500) != 0:
-                raise ValueError("無効な値です")
-            if amount > difference:
-                raise ValueError("無効な値です")
-
-        paid = player.hand.pay(**nums)
+        paid = player.hand.pay(a=a, b=b, c=c, d=d, e=e)
         turn_player.hand.add(paid)
 
-        if change:
-            turn_player.changes[sid] = paid.amount - 100
+        if self.drawn == 100 and paid.amount() != 100:
+            turn_player.changes[sid] = paid.amount() - 100
             player.paid = 100
         else:
-            player.paid += paid.amount
+            player.paid = paid.amount()
 
-        player_count = 0
+        try:
+            self.next_turn()
+        except Exception:
+            pass
+
+    def next_turn(self):
+        if self.status < 1:
+            raise Exception("ターンを送ることができません")
+
+        if self.drawn == 0:
+            raise Exception("ターンを送ることができません")
+
+        turn_player = self.players[self.order[self.turn]]
+
         for player in self.players.values():
-            if not player.paid == self.drawn:
-                player_count += 1
+            if player == turn_player:
+                continue
+            if player.paid != self.drawn:
+                raise Exception("支払いを完了していないプレイヤーがいます")
 
-        if player_count == 1 and len(turn_player.changes) == 0:
-            self.turn += 1
+        if len(turn_player.changes) != 0:
+            raise Exception("お釣りの返却が済んでいません")
+
+        self.turn += 1
 
         if self.turn == len(self.order):
             self.turn = 0
             self.status += 1
             self.drawn = 0
             for player in self.players.values():
-                players.paid = 0
+                player.paid = 0
+
+    def give_change(self, sid, opponent_sid, *, a=0, b=0, c=0, d=0, e=0):
+        player = self.players[sid]
+        opponent_player = self.players[opponent_sid]
+
+        if self.status < 1:
+            raise Exception("お釣りを渡せません")
+
+        if self.drawn == 0:
+            raise Exception("お釣りを渡せません")
+
+        if sid != self.order[self.turn]:
+            raise ValueError("順番のプレイヤーではありません")
+
+        if opponent_sid not in player.changes:
+            raise ValueError("お釣りは要りません")
+
+        amount = 0
+        for letter, value in {"a": 100, "bc": 500, "d": 1000, "e": 2000}.items():
+            amount += value * {"a": a, "bc": b+c, "d": d, "e": e}[letter]
+
+        if amount != player.changes[opponent_sid]:
+            raise ValueError("金額が一致しません")
+
+        change = player.hand.pay(a=a, b=b, c=c, d=d, e=e)
+        opponent_player.hand.add(change)
+        player.changes.pop(opponent_sid)
+
+        try:
+            self.next_turn()
+        except Exception:
+            pass
