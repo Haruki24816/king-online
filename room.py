@@ -471,6 +471,8 @@ class Room:
             self.drawn = 0
             for player in self.players.values():
                 player.paid = 0
+            if self.status == 2:
+                self.deck.add(Cards(re=2, ge=2, be=2))
 
     def give_change(self, sid, opponent_sid, *, a=0, b=0, c=0, d=0, e=0):
         player = self.players[sid]
