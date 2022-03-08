@@ -16,7 +16,7 @@ class Cards(dict):
 
     def add(self, cards):
         if type(cards) != type(self):
-            raise ValueError("Cardsクラスではありません")
+            raise TypeError("Cardsクラスではありません")
 
         for kind, num in cards.items():
             if kind not in self:
@@ -25,7 +25,7 @@ class Cards(dict):
 
     def remove(self, cards):
         if type(cards) != type(self):
-            raise ValueError("Cardsクラスではありません")
+            raise TypeError("Cardsクラスではありません")
 
         if not self.is_contained(cards):
             raise ValueError("指定されたカードは含まれていません")
@@ -37,7 +37,7 @@ class Cards(dict):
 
     def is_contained(self, cards):
         if type(cards) != type(self):
-            raise ValueError("Cardsクラスではありません")
+            raise TypeError("Cardsクラスではありません")
 
         for kind, num in cards.items():
             if (kind not in self) or (self[kind] < num):
@@ -154,7 +154,7 @@ class Cards(dict):
 
     def can_pay(self, amount, cards, a=0, bc=0, d=0, e=0):
         if type(cards) != type(self):
-            raise ValueError("Cardsクラスではありません")
+            raise TypeError("Cardsクラスではありません")
 
         nums = {"a": a, "bc": b+c, "d": d, "e": e}
 
@@ -233,6 +233,25 @@ class Player:
         if self.debts[sid] == 0:
             self.debts.pop(sid)
 
+    def info(self):
+        data = {
+            "player_name": self.name,
+            "player_status": self.status
+        }
+
+        try:
+            data.update({
+                "hand": dict(self.hand),
+                "temp": dict(self.temp),
+                "debts": self.debts,
+                "paid": self.paid,
+                "changes": self.changes
+            })
+        except TypeError:
+            pass
+
+        return data
+
 
 class Room:
 
@@ -250,7 +269,28 @@ class Room:
         self.drawn = None #引かれた額
 
     def info(self):
-        pass
+        player_data = {}
+
+        for sid, player in self.players.items():
+            player_data[sid] = player.info()
+
+        data = {
+            "room_name": self.name,
+            "room_status": self.status,
+            "players": player_data
+        }
+
+        try:
+            data.update({
+                "deck": dict(self.deck),
+                "order": self.order,
+                "turn": self.turn,
+                "drawn": self.drawn
+            })
+        except TypeError:
+            pass
+
+        return data
 
     def add_player(self, sid):
         if self.status != 0:
