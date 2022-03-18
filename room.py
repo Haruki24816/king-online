@@ -435,6 +435,10 @@ class Room:
                 self.status = 1
         else:
             self.drawn = drawn.amount()
+            if list(drawn.keys())[0][1] == "c":
+                return "キング"
+            else:
+                return f"{self.drawn}円"
 
     def pay(self, sid, *, a=0, b=0, c=0, d=0, e=0):
         player = self.players[sid]
@@ -465,13 +469,17 @@ class Room:
         if self.drawn == 100 and paid.amount() != 100:
             turn_player.changes[sid] = paid.amount() - 100
             player.paid = 100
+            message = f"{player.paid}円支払います。お釣りをください"
         else:
             player.paid += paid.amount()
+            message = f"{player.paid}円支払います"
 
         try:
             self.next_turn()
         except Exception:
             pass
+
+        return message
 
     def next_turn(self):
         if self.status < 1:
@@ -550,6 +558,8 @@ class Room:
             self.next_turn()
         except Exception:
             pass
+
+        return f"{opponent_player.name}のお釣りを支払いました"
 
     def borrow(self, sid, amount):
         player = self.players[sid]

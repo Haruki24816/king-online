@@ -34,7 +34,7 @@ def room(room_id):
 @socketio.on("join")
 def on_join(data):
     if data["room_id"] not in rooms:
-        emit("kick", {"message": "存在しない部屋です"})
+        emit("kick", {"message": "エラー：存在しない部屋です"})
         return
 
     room_id = data["room_id"]
@@ -43,7 +43,7 @@ def on_join(data):
     try:
         room.add_player(request.sid)
     except Exception as error:
-        emit("kick", {"message": str(error)})
+        emit("kick", {"message": f"エラー：{str(error)}"})
         return
 
     join_room(room_id)
@@ -66,23 +66,28 @@ def on_disconnect():
     room_id = session["room_id"]
     room = rooms[room_id]
 
-    room.remove_player(request.sid)
+    player_name = room.remove_player(request.sid)
     emit("update", room.info(), to=room_id)
     session.pop("room_id")
+
+    if player_name != "":
+        emit("receive_message", {"author": "server", "message": f"{player_name}が退室しました"}, to=room_id)
 
 
 @socketio.on("register_player_name")
 def on_register_player_name(data):
     room_id = session["room_id"]
     room = rooms[room_id]
+    player_name = data["name"]
 
     try:
-        room.register_player_name(request.sid, data["name"])
+        room.register_player_name(request.sid, player_name)
     except Exception as error:
-        emit("receive_message", {"author": "server", "message": str(error)})
+        emit("receive_message", {"author": "server", "message": f"エラー：{str(error)}"})
         return
 
     emit("update", room.info(), to=room_id)
+    emit("receive_message", {"author": "server", "message": f"{player_name}が入室しました"}, to=room_id)
 
 
 @socketio.on("update_player_status")
@@ -93,10 +98,57 @@ def on_update_player_status(data):
     try:
         room.update_player_status(request.sid, data["player_status"])
     except Exception as error:
-        emit("receive_message", {"author": "server", "message": str(error)})
+        emit("receive_message", {"author": "server", "message": f"エラー：{str(error)}"})
         return
 
     emit("update", room.info(), to=room_id)
+
+    if data["player_status"] == 1:
+        emit("receive_message", {"author": request.sid, "message": "準備ができました"}, to=room_id)
+
+
+@socketio.on("draw")
+def on_draw(data):
+    room_id = session["room_id"]
+    room = rooms[room_id]
+
+    try:
+        card = room.draw(request.sid, **data)
+    except Exception as error:
+        emit("receive_message", {"author": "server", "message": f"エラー：{str(error)}"})
+
+    emit("update", room.info(), to=room_id)
+
+    if card != None:
+        emit("receive_message", {"author": request.sid, "message": f"{card}を引きました"}, to=room_id)
+
+
+@socketio.on("pay")
+def on_pay(data):
+    room_id = session["room_id"]
+    room = rooms[room_id]
+
+    try:
+        message = room.pay(request.sid, **data)
+    except Exception as error:
+        emit("receive_message", {"author": "server", "message": f"エラー：{str(error)}"})
+
+    emit("update", room.info(), to=room_id)
+    emit("receive_message", {"author": request.sid, "message": message}, to=room_id)
+
+
+@socketio.on("give_change")
+def on_give_change(data):
+    room_id = session["room_id"]
+    room = rooms[room_id]
+
+    try:
+        message = room.give_change(request.sid, **data)
+    except Exception as error:
+        emit("receive_message", {"author": "server", "message": f"エラー：{str(error)}"})
+
+    emit("update", room.info(), to=room_id)
+    emit("receive_message", {"author": request.sid, "message": message}, to=room_id)
 
 
 if __name__ == "__main__":
