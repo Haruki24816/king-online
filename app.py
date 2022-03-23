@@ -151,5 +151,33 @@ def on_give_change(data):
     emit("receive_message", {"author": request.sid, "message": message}, to=room_id)
 
 
+@socketio.on("borrow")
+def on_borrow(data):
+    room_id = session["room_id"]
+    room = rooms[room_id]
+
+    try:
+        message = room.borrow(request.sid, **data)
+    except Exception as error:
+        emit("receive_message", {"author": "server", "message": f"エラー：{str(error)}"})
+
+    emit("update", room.info(), to=room_id)
+    emit("receive_message", {"author": request.sid, "message": message}, to=room_id)
+
+
+@socketio.on("repay")
+def on_repay(data):
+    room_id = session["room_id"]
+    room = rooms[room_id]
+
+    try:
+        message = room.repay(request.sid, **data)
+    except Exception as error:
+        emit("receive_message", {"author": "server", "message": f"エラー：{str(error)}"})
+
+    emit("update", room.info(), to=room_id)
+    emit("receive_message", {"author": request.sid, "message": message}, to=room_id)
+
+
 if __name__ == "__main__":
     socketio.run(app, debug=True)

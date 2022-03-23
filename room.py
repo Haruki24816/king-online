@@ -589,6 +589,8 @@ class Room:
         except Exception:
             pass
 
+        return f"{amount}円借金"
+
     def repay(self, sid, opponent_sid, *, a=0, b=0, c=0, d=0, e=0):
         player = self.players[sid]
         opponent_player = self.players[opponent_sid]
@@ -633,3 +635,5 @@ class Room:
                     p.hand.add(player.temp)
                     p.temp.clear()
                 self.status = -3
+
+        return f"{opponent_player.name}に{amount}円返済"
