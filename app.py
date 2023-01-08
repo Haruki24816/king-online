@@ -1,5 +1,5 @@
 from flask import Flask, send_from_directory
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, emit
 import secrets
 
 
@@ -17,6 +17,11 @@ else:
 @app.route("/<path:path>")
 def catch_all(path):
     return send_from_directory("dist", path)
+
+
+@socketio.on("message")
+def receive_message(data):
+    emit("message", data, broadcast=True)
 
 
 if __name__ == "__main__":

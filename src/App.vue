@@ -1,29 +1,41 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
+import { ref } from "vue"
+import { io } from "socket.io-client"
+import Message from "./components/Message.vue"
+import MessageForm from "./components/MessageForm.vue"
+
+const socket = io()
+const log = ref([])
+
+socket.on("connect", () => {
+  log.value.push(["[システム]", getTimestamp(), "接続"])
+})
+
+socket.on("disconnect", () => {
+  log.value.push(["[システム]", getTimestamp(), "切断"])
+})
+
+socket.on("message", (data) => {
+  log.value.push([data[0], getTimestamp(), data[1]])
+})
+
+function sendMessage(name, content) {
+  socket.emit("message", [name, content])
+}
+
+function getTimestamp() {
+  const dd = new Date()
+  const hh = dd.getHours()
+  const mm = dd.getMinutes()
+  const ss = dd.getSeconds()
+  return hh + ":" + mm + ":" + ss
+}
 </script>
 
 <template>
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/logo.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
+  <div class="container">
+    <h1 class="my-4">適当チャット</h1>
+    <Message v-for="message in log" :author="message[0]" :timestamp="message[1]" :content="message[2]" />
   </div>
-  <HelloWorld msg="Vite + Vue" />
+  <MessageForm @send-message="sendMessage($event[0], $event[1])" />
 </template>
-
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
-</style>
