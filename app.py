@@ -5,12 +5,7 @@ import secrets
 
 app = Flask(__name__)
 app.secret_key = secrets.token_bytes()
-
-
-if __name__ == "__main__":
-    socketio = SocketIO(app, logger=True, engineio_logger=True)
-else:
-    socketio = SocketIO(app)
+socketio = SocketIO(app, logger=True, engineio_logger=True)
 
 
 @app.route("/", defaults={"path": "index.html"})
