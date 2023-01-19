@@ -1,7 +1,9 @@
 <template>
   <div class="bg-primary position-relative -background">
     <div class="position-absolute top-50 start-50 translate-middle text-center -content">
-      <img src="./logo.svg" class="-image">
+      <div>
+        <img src="./logo.svg" class="-image">
+      </div>
       <slot></slot>
     </div>
   </div>
