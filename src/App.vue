@@ -1,7 +1,7 @@
 <script setup>
 import { store0 } from "./store0.js"
-import SplashScreen from "./SplashScreen.vue"
-import MessageScreen from "./MessageScreen.vue"
+import SplashScreen from "./components/SplashScreen.vue"
+import MessageScreen from "./components/MessageScreen.vue"
 </script>
 
 <template>
