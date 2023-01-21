@@ -1,5 +1,6 @@
 <template>
   <div class="container text-center -content">
+    <img src="../assets/logo.svg" class="my-5 -image">
     <div class="accordion" id="entranceAccordion">
       <div class="accordion-item">
         <h2 class="accordion-header" id="headingOne">
@@ -65,8 +66,13 @@
   </div>
 </template>
 
-<style>
+<style scoped>
 .-content {
   max-width: 400px;
+}
+
+.-image {
+  width: 100%;
+  max-width: 300px;
 }
 </style>
