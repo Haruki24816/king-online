@@ -1,5 +1,5 @@
 <script setup>
-import { store0 } from "../store0.js"
+import { store0 } from "/src/store0.js"
 </script>
 
 <template>

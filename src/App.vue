@@ -1,8 +1,8 @@
 <script setup>
-import { store0 } from "./store0.js"
-import SplashScreen from "./components/SplashScreen.vue"
-import EntranceScreen from "./components/EntranceScreen.vue"
-import DisconnectScreen from "./components/DisconnectScreen.vue"
+import { store0 } from "/src/store0.js"
+import SplashScreen from "./app-children/SplashScreen.vue"
+import EntranceScreen from "./app-children/EntranceScreen.vue"
+import DisconnectScreen from "./app-children/DisconnectScreen.vue"
 </script>
 
 <template>
