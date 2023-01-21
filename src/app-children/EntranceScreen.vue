@@ -5,8 +5,10 @@ import AboutApp from "./entrance-screen-children/AboutApp.vue"
 </script>
 
 <template>
-  <div class="container text-center -content">
-    <img src="../assets/logo.svg" class="my-5 -image">
+  <div class="container -content">
+    <div class="text-center my-5">
+      <img src="../assets/logo.svg" class="-image">
+    </div>
     <div class="accordion" id="entranceAccordion">
       <div class="accordion-item">
         <h2 class="accordion-header" id="headingOne">
