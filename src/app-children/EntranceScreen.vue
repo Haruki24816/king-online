@@ -7,7 +7,7 @@ import AboutApp from "./entrance-screen-children/AboutApp.vue"
 <template>
   <div class="container -content">
     <div class="text-center my-5">
-      <img src="../assets/logo.svg" class="-image">
+      <img src="/src/assets/logo.svg" class="-image">
     </div>
     <div class="accordion" id="entranceAccordion">
       <div class="accordion-item">

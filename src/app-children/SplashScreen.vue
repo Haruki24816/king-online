@@ -1,7 +1,7 @@
 <template>
   <div class="bg-primary position-relative -background">
     <div class="position-absolute top-50 start-50 translate-middle">
-      <img src="../assets/symbol.svg" class="-image">
+      <img src="/src/assets/symbol.svg" class="-image">
     </div>
   </div>
 </template>
