@@ -1,38 +1,74 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-      <div class="d-flex align-items-center">
-        <div>
-          <img src="/src/assets/symbol.svg" height="40">
+  <div class="d-flex flex-column -base">
+    <div class="d-flex d-lg-none align-items-center container-fluid bg-dark p-1">
+      <button type="button" class="btn btn-dark" data-bs-toggle="offcanvas" data-bs-target="#offcanvasLeft">
+        <i class="bi bi-list fs-5"></i>
+      </button>
+      <div class="flex-grow-1 text-center">
+        <div class="text-white -bar-room-name"><strong>部屋の名前</strong></div>
+        <div class="text-white -bar-room-info">部屋の情報</div>
+      </div>
+      <button type="button" class="btn btn-dark" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight">
+        <i class="bi bi-chat-dots fs-5"></i>
+      </button>
+    </div>
+    <div class="d-flex align-items-stretch container flex-grow-1">
+      <div class="d-none d-lg-flex flex-column align-items-stretch my-3 me-3 -left-box">
+        <div class="bg-dark rounded mb-3">
+          <br>
         </div>
-        <div class="ms-2 me-4">
-          <div class="text-white lh-sm fs-5">部屋名</div>
-          <div class="text-white lh-sm"><small>部屋の情報・部屋の情報</small></div>
+        <div class="bg-white rounded flex-grow-1">
         </div>
       </div>
-      <div class="d-flex">
-        <div class="flex-grow-1"></div>
-        <button class="navbar-toggler me-1" type="button">
-          <i class="bi bi-chat-dots"></i>
-        </button>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
-          <i class="bi bi-list"></i>
-        </button>
+      <div class="d-flex flex-column align-items-stretch my-3 flex-grow-1">
+        <div class="bg-white rounded flex-grow-1 mb-3">
+        </div>
+        <div class="bg-white rounded">
+          <br>
+        </div>
       </div>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="mt-3"></li>
-          <li class="nav-item">
-            <a class="nav-link" href="javascript:void(0)">メニュー項目</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="javascript:void(0)">メニュー項目</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="javascript:void(0)">メニュー項目</a>
-          </li>
-        </ul>
+      <div class="d-none d-lg-flex flex-column align-items-stretch my-3 ms-3 -right-box">
+        <div class="bg-white rounded flex-grow-1 p-3">
+        </div>
       </div>
     </div>
-  </nav>
+  </div>
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasLeft">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasLeftLabel"></h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+    </div>
+  </div>
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight">
+    <div class="offcanvas-header">
+      <h5 id="offcanvasRightLabel"></h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+    </div>
+  </div>
 </template>
+
+<style scoped>
+.-base {
+  height: 100vh;
+}
+
+.-left-box {
+  width: 200px;
+}
+
+.-right-box {
+  width: 300px;
+}
+
+.-bar-room-name {
+  font-size: 16px;
+}
+
+.-bar-room-info {
+  font-size: 12px;
+}
+</style>
