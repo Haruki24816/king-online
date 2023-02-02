@@ -1,12 +1,12 @@
 <template>
-  <div class="d-flex flex-column -base">
+  <div class="d-flex flex-column -background">
     <div class="d-flex d-lg-none align-items-center container-fluid bg-dark p-1">
       <button type="button" class="btn btn-dark" data-bs-toggle="offcanvas" data-bs-target="#offcanvasLeft">
         <i class="bi bi-list fs-5"></i>
       </button>
       <div class="flex-grow-1 text-center">
         <div class="text-white -bar-room-name"><strong>部屋の名前</strong></div>
-        <div class="text-white -bar-room-info">部屋の情報</div>
+        <div class="text-white -bar-room-info">0人・募集中</div>
       </div>
       <button type="button" class="btn btn-dark" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight">
         <i class="bi bi-chat-dots fs-5"></i>
@@ -14,10 +14,26 @@
     </div>
     <div class="d-flex align-items-stretch container flex-grow-1">
       <div class="d-none d-lg-flex flex-column align-items-stretch my-3 me-3 -left-box">
-        <div class="bg-dark rounded mb-3">
-          <br>
+        <div class="bg-dark rounded mb-3 p-3 text-center text-white">
+          <img src="/src/assets/logo.svg" width="160">
+          <div class="mt-1">部屋の名前</div>
+          <h5>部屋の名前</h5>
         </div>
-        <div class="bg-white rounded flex-grow-1">
+        <div class="bg-dark rounded mb-3 px-4 py-3 text-white">
+          <div class="row row-cols-2 p-0">
+            <div class="col">参加人数</div>
+            <div class="col text-end">0人</div>
+            <div class="col">状況</div>
+            <div class="col text-end">募集中</div>
+          </div>
+        </div>
+        <div class="bg-white rounded flex-grow-1 p-3 text-center overflow-auto -overflow">
+          <div class="d-grid gap-2">
+            <button type="button" class="btn btn-light">メニュー項目</button>
+            <button type="button" class="btn btn-light">メニュー項目</button>
+            <button type="button" class="btn btn-light">メニュー項目</button>
+            <button type="button" class="btn btn-light">メニュー項目</button>
+          </div>
         </div>
       </div>
       <div class="d-flex flex-column align-items-stretch my-3 flex-grow-1">
@@ -52,7 +68,7 @@
 </template>
 
 <style scoped>
-.-base {
+.-background {
   height: 100vh;
 }
 
@@ -70,5 +86,9 @@
 
 .-bar-room-info {
   font-size: 12px;
+}
+
+.-overflow {
+  height: 0;
 }
 </style>
