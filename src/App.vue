@@ -3,7 +3,7 @@ import { ref } from "vue"
 import OutsideScreen from "./app-children/OutsideScreen.vue"
 import InsideScreen from "./app-children/InsideScreen.vue"
 
-const num = ref(1)
+const num = ref(0)
 </script>
 
 <template>
