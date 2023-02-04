@@ -1,3 +1,3 @@
 <template>
-  <div>ゲームコマンド</div>
+  <br>
 </template>
