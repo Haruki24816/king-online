@@ -1,5 +1,8 @@
 <script setup>
 import { store0 } from "/src/store0.js"
+import EnterRoom from "./outside-screen-children/EnterRoom.vue"
+import MakeRoom from "./outside-screen-children/MakeRoom.vue"
+import About from "./outside-screen-children/About.vue"
 </script>
 
 <template>
@@ -29,7 +32,7 @@ import { store0 } from "/src/store0.js"
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
-          部屋に入る
+          <EnterRoom />
         </div>
       </div>
     </div>
@@ -42,7 +45,7 @@ import { store0 } from "/src/store0.js"
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
-          部屋を作る
+          <MakeRoom />
         </div>
       </div>
     </div>
@@ -55,7 +58,7 @@ import { store0 } from "/src/store0.js"
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
-          このサイトについて
+          <About />
         </div>
       </div>
     </div>
