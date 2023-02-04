@@ -1,12 +1,10 @@
 <script setup>
-import { ref } from "vue"
+import { store0 } from "/src/store0.js"
 import OutsideScreen from "./app-children/OutsideScreen.vue"
 import InsideScreen from "./app-children/InsideScreen.vue"
-
-const num = ref(1)
 </script>
 
 <template>
-  <OutsideScreen v-if="num == 0" />
-  <InsideScreen v-if="num == 1" />
+  <OutsideScreen v-if="store0.appMode == 'outside'" />
+  <InsideScreen v-if="store0.appMode == 'inside'" />
 </template>
