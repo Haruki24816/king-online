@@ -7,11 +7,11 @@ import InsideScreen from "./app-children/InsideScreen.vue"
 const $socket = inject("$socket")
 
 $socket.on("connect", () => {
-  console.log("connect")
+  store0.value.connection = true
 })
 
 $socket.on("disconnect", () => {
-  console.log("disconnect")
+  store0.value.connection = false
 })
 </script>
 

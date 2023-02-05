@@ -6,5 +6,7 @@ export const store0 = ref({
   roomName: "",
   roomInfo: {},
   disconnectionReason: "",
-  overlay: false
+  overlay: false,
+  connection: false,
+  entranceLock: false
 })
