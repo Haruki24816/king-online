@@ -5,9 +5,11 @@ import MenuPanel from "./inside-screen-children/MenuPanel.vue"
 import GameDisplayPanel from "./inside-screen-children/GameDisplayPanel.vue"
 import GameCommandPanel from "./inside-screen-children/GameCommandPanel.vue"
 import ChatSpacePanel from "./inside-screen-children/ChatSpacePanel.vue"
+import ReconnectionOverlay from "./inside-screen-children/ReconnectionOverlay.vue"
 </script>
 
 <template>
+  <ReconnectionOverlay />
   <div class="d-flex flex-column -background">
     <div class="d-flex d-lg-none align-items-center container-fluid bg-dark p-1">
       <TopBar />
