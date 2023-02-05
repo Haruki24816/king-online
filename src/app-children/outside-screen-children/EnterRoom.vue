@@ -9,10 +9,10 @@ const playerName = ref("")
 
 const buttonClass = computed(() => {
   if (roomId.value.length == 8 &&
-      1 <= playerName.value.length &&
-      playerName.value.length <= 100 &&
-      store0.value.connection &&
-      ! store0.value.entranceLock) {
+    1 <= playerName.value.length &&
+    playerName.value.length <= 100 &&
+    store0.value.connection &&
+    !store0.value.entranceLock) {
     return "btn btn-primary"
   } else {
     return "btn btn-primary disabled"
@@ -21,7 +21,7 @@ const buttonClass = computed(() => {
 
 function enterRoom() {
   store0.value.entranceLock = true
-  $socket.emit("c0-enter-room", {"room_id": roomId, "player_name": playerName})
+  $socket.emit("c0-enter-room", { "room_id": roomId, "player_name": playerName })
 }
 </script>
 
