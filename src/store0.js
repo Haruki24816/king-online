@@ -3,10 +3,14 @@ import { ref } from "vue"
 export const store0 = ref({
   appMode: "outside", // outside, inside
   outsideMode: "menu", // menu, message
-  roomName: "",
+  roomName: undefined,
   roomInfo: {},
-  disconnectionReason: "",
+  disconnectionReason: undefined,
   overlay: false,
   connection: false,
-  entranceLock: false
+  entranceLock: false,
+  failedMakeRoomReason: undefined,
+  failedMakeRoomAlert: false,
+  failedEnterRoomReason: undefined,
+  failedEnterRoomAlert: false
 })

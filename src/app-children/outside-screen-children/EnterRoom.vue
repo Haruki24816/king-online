@@ -6,8 +6,6 @@ const $socket = inject("$socket")
 
 const roomId = ref("")
 const playerName = ref("")
-const reason = ref("")
-const alert = ref(false)
 
 const buttonClass = computed(() => {
   if (roomId.value.length == 8 &&
@@ -23,21 +21,15 @@ const buttonClass = computed(() => {
 
 function enterRoom() {
   store0.value.entranceLock = true
-  alert.value = false
+  store0.value.failedEnterRoomAlert = false
   $socket.emit("c0-enter-room", { "room_id": roomId, "player_name": playerName })
 }
-
-$socket.on("s0-failed-enter-room", (data) => {
-  reason.value = data.reason
-  alert.value = true
-  store0.value.entranceLock = false
-})
 </script>
 
 <template>
-  <div class="alert alert-danger d-flex align-items-center" v-if="alert">
+  <div class="alert alert-danger d-flex align-items-center" v-if="store0.failedEnterRoomAlert">
     <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
-    <div>{{ reason }}</div>
+    <div>{{ store0.failedEnterRoomReason }}</div>
   </div>
   <div class="form-floating mb-3">
     <input type="text" class="form-control" id="enterRoomId" placeholder="" v-model="roomId">
