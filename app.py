@@ -18,11 +18,6 @@ def catch_all(path):
     return send_from_directory("dist", path)
 
 
-@socketio.on_error()
-def error_handler(_):
-    emit("s0-error")
-
-
 @socketio.on("c0-make-room")
 def make_room(data):
     room_name = data["room_name"]

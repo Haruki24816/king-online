@@ -12,6 +12,5 @@ export const store0 = ref({
   failedMakeRoomReason: undefined,
   failedMakeRoomAlert: false,
   failedEnterRoomReason: undefined,
-  failedEnterRoomAlert: false,
-  errorModal: undefined
+  failedEnterRoomAlert: false
 })

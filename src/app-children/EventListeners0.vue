@@ -12,10 +12,6 @@ $socket.on("disconnect", () => {
   store0.value.connection = false
 })
 
-$socket.on("s0-error", () => {
-  store0.value.errorModal.show()
-})
-
 $socket.on("s0-enter-room", (data) => {
   console.log("s0-enter-room")
 })
