@@ -6,10 +6,26 @@ const $socket = inject("$socket")
 
 $socket.on("connect", () => {
   store0.value.connection = true
+  if (store0.value.overlay == true) {
+    $socket.emit("c0-reconnect", {
+      room_id: store0.value.roomId,
+      player_id: store0.value.playerId
+    })
+  }
 })
 
-$socket.on("disconnect", () => {
+$socket.on("disconnect", async () => {
   store0.value.connection = false
+  if (store0.value.appMode == "inside") {
+    store0.value.overlay = true
+    await sleep(70000)
+    if (store0.value.overlay == true) {
+      store0.value.appMode = "outside"
+      store0.value.outsideMode = "message"
+      store0.value.disconnectionReason = "接続を維持できなくなりました"
+      $socket.disconnect()
+    }
+  }
 })
 
 $socket.on("s0-error-unknown", () => {
@@ -31,7 +47,6 @@ $socket.on("s0-dist-room-info", (data) => {
 
 $socket.on("s0-dist-players-data", (data) => {
   store0.value.players = data.players
-  console.log(data.players)
 })
 
 $socket.on("s0-error-no-room-id", () => {
@@ -45,11 +60,14 @@ $socket.on("s0-error-same-player-name", () => {
 })
 
 $socket.on("s0-reconnect", () => {
-  console.log("s0-reconnect")
+  store0.value.overlay = false
 })
 
 $socket.on("s0-failed-reconnect", () => {
-  console.log("s0-failed-reconnect")
+  store0.value.appMode = "outside"
+  store0.value.outsideMode = "message"
+  store0.value.disconnectionReason = "接続を維持できなくなりました"
+  $socket.disconnect()
 })
 </script>
 

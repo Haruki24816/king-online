@@ -13,6 +13,10 @@ onMounted(() => {
   store0.value.enterModal = new Modal(enterModal.value)
   store0.value.makeModal = new Modal(makeModal.value)
 })
+
+function reload() {
+  location.reload()
+}
 </script>
 
 <template>
@@ -30,7 +34,7 @@ onMounted(() => {
       <template v-if="store0.outsideMode == 'message'">
         <h3 class="text-white mt-4">退室しました</h3>
         <p class="text-white">{{ store0.disconnectionReason }}</p>
-        <button type="button" class="btn btn-dark">戻る</button>
+        <button type="button" class="btn btn-dark" @click="reload">戻る</button>
       </template>
     </div>
   </div>
