@@ -21,13 +21,13 @@ const buttonClass = computed(() => {
 
 function enterRoom() {
   store0.value.entranceLock = true
-  store0.value.failedEnterRoomAlert = false
-  $socket.emit("c0-enter-room", { "room_id": roomId, "player_name": playerName })
+  store0.value.failedEnterRoomReason = undefined
+  $socket.emit("c0-enter-room", { "room_id": roomId.value, "player_name": playerName.value })
 }
 </script>
 
 <template>
-  <div class="alert alert-danger d-flex align-items-center" v-if="store0.failedEnterRoomAlert">
+  <div class="alert alert-danger d-flex align-items-center" v-if="store0.failedEnterRoomReason != undefined">
     <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
     <div>{{ store0.failedEnterRoomReason }}</div>
   </div>

@@ -22,16 +22,11 @@ const buttonClass = computed(() => {
 
 function makeRoom() {
   store0.value.entranceLock = true
-  store0.value.failedMakeRoomAlert = false
-  $socket.emit("c0-make-room", { "room_name": roomName, "owner_name": ownerName })
+  $socket.emit("c0-make-room", { "room_name": roomName.value, "owner_name": ownerName.value })
 }
 </script>
 
 <template>
-  <div class="alert alert-danger d-flex align-items-center" v-if="store0.failedMakeRoomAlert">
-    <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
-    <div>{{ store0.failedMakeRoomReason }}</div>
-  </div>
   <div class="form-floating mb-3">
     <input type="text" class="form-control" id="makeRoomName" placeholder="" v-model="roomName">
     <label for="makeRoomName">部屋の名前</label>

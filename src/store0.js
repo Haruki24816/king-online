@@ -9,8 +9,5 @@ export const store0 = ref({
   overlay: false,
   connection: false,
   entranceLock: false,
-  failedMakeRoomReason: undefined,
-  failedMakeRoomAlert: false,
-  failedEnterRoomReason: undefined,
-  failedEnterRoomAlert: false
+  failedEnterRoomReason: undefined
 })
