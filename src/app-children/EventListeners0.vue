@@ -14,17 +14,18 @@ $socket.on("connect", () => {
   }
 })
 
-$socket.on("disconnect", async () => {
+$socket.on("disconnect", () => {
   store0.value.connection = false
   if (store0.value.appMode == "inside") {
     store0.value.overlay = true
-    await sleep(70000)
-    if (store0.value.overlay == true) {
-      store0.value.appMode = "outside"
-      store0.value.outsideMode = "message"
-      store0.value.disconnectionReason = "接続を維持できなくなりました"
-      $socket.disconnect()
-    }
+    setTimeout(() => {
+      if (store0.value.overlay == true) {
+        store0.value.appMode = "outside"
+        store0.value.outsideMode = "message"
+        store0.value.disconnectionReason = "接続を維持できなくなりました"
+        $socket.disconnect()
+      }
+    }, 70000)
   }
 })
 
