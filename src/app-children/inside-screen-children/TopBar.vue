@@ -8,9 +8,9 @@ import { store0 } from "/src/store0.js"
   </button>
   <div class="flex-grow-1 text-center text-white text-truncate">
     <strong>{{ store0.roomName }}</strong>
-    <ul class="list-inline m-0 -text-small">
-      <li class="list-inline-item" v-for="value in store0.roomInfo">{{ value }}</li>
-    </ul>
+    <div class="-text-small">
+      {{ store0.playerNum }}人
+    </div>
   </div>
   <button type="button" class="btn btn-dark" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight">
     <i class="bi bi-chat-dots fs-5"></i>

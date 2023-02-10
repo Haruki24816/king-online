@@ -4,10 +4,15 @@ export const store0 = ref({
   appMode: "outside", // outside, inside
   outsideMode: "menu", // menu, message
   roomName: undefined,
-  roomInfo: {},
   disconnectionReason: undefined,
   overlay: false,
   connection: false,
   entranceLock: false,
-  failedEnterRoomReason: undefined
+  failedEnterRoomReason: undefined,
+  roomId: undefined,
+  playerId: undefined,
+  players: undefined,
+  playerNum: undefined,
+  enterModal: undefined,
+  makeModal: undefined
 })

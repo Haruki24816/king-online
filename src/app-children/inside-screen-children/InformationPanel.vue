@@ -8,10 +8,8 @@ import { store0 } from "/src/store0.js"
     <div class="text-center">部屋の名前</div>
     <h5 class="text-center mx-2">{{ store0.roomName }}</h5>
     <div class="row row-cols-2 mt-3 mb-3 mx-4 g-0">
-      <template v-for="(value, key) in store0.roomInfo">
-        <div class="col">{{ key }}</div>
-        <div class="col text-end">{{ value }}</div>
-      </template>
+      <div class="col">人数</div>
+      <div class="col text-end">{{ store0.playerNum }}</div>
     </div>
   </div>
 </template>

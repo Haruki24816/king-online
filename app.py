@@ -25,9 +25,8 @@ def error_handler(error):
         emit(str(error))
     else:
         emit("s0-error-unknown")
-    
-    import traceback
-    traceback.print_exc()
+        import traceback
+        traceback.print_exc()
 
 
 @socketio.on("c0-make-room")
@@ -36,7 +35,8 @@ def make_room(data):
     owner_name = data["owner_name"]
 
     while True:
-        room_id = "".join(random.sample(string.ascii_letters + string.digits, k=8))
+        room_id = "".join(random.sample(
+            string.ascii_letters + string.digits, k=8))
         if room_id not in rooms:
             break
 
@@ -50,7 +50,7 @@ def make_room(data):
     join_room(room_id)
     emit("s0-enter-room", {"room_id": room_id, "player_id": player_id})
     emit("s0-dist-room-info", {"room_info": room.info()})
-    emit("s0-dist-player-data", {"player_data": room.players})
+    emit("s0-dist-players-data", {"players": room.players})
 
 
 @socketio.on("c0-enter-room")
@@ -60,17 +60,17 @@ def enter_room(data):
 
     if room_id not in rooms:
         raise EventError0("s0-error-no-room-id")
-    
+
     room = rooms[room_id]
     player_id = room.add_player(player_name)
-    
+
     session["room_id"] = room_id
     session["player_id"] = player_id
 
     join_room(room_id)
     emit("s0-enter-room", {"room_id": room_id, "player_id": player_id})
     emit("s0-dist-room-info", {"room_info": room.info()}, to=room_id)
-    emit("s0-dist-player-data", {"player_data": room.players}, to=room_id)
+    emit("s0-dist-players-data", {"players": room.players}, to=room_id)
 
 
 @socketio.on("c0-leave")
@@ -86,7 +86,7 @@ def leave():
 
     leave_room(room_id)
     emit("s0-dist-room-info", {"room_info": room.info()}, to=room_id)
-    emit("s0-dist-player-data", {"player_data": room.players}, to=room_id)
+    emit("s0-dist-players-data", {"players": room.players}, to=room_id)
 
 
 @socketio.on("disconnect")
@@ -96,17 +96,17 @@ def disconnect():
 
     if room_id == None:
         return
-    
+
     room = rooms[room_id]
     room.offline(player_id)
 
-    emit("s0-dist-player-data", {"player_data": room.players}, to=room_id)
+    emit("s0-dist-players-data", {"players": room.players}, to=room_id)
     socketio.sleep(60)
 
     if room.is_offline(player_id):
         room.leave(player_id)
         emit("s0-dist-room-info", {"room_info": room.info()}, to=room_id)
-        emit("s0-dist-player-data", {"player_data": room.players}, to=room_id)
+        emit("s0-dist-players-data", {"players": room.players}, to=room_id)
 
 
 @socketio.on("c0-reconnect")
@@ -122,7 +122,7 @@ def reconnect(data):
         join_room(room_id)
         emit("s0-reconnect")
         emit("s0-dist-room-info", {"room_info": room.info()}, to=room_id)
-        emit("s0-dist-player-data", {"player_data": room.players}, to=room_id)
+        emit("s0-dist-players-data", {"players": room.players}, to=room_id)
     else:
         emit("s0-failed-reconnect")
 

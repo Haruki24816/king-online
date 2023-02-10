@@ -1,8 +1,18 @@
 <script setup>
+import { ref, onMounted } from "vue"
 import { store0 } from "/src/store0.js"
+import { Modal } from "bootstrap"
 import EnterRoom from "./outside-screen-children/EnterRoom.vue"
 import MakeRoom from "./outside-screen-children/MakeRoom.vue"
 import About from "./outside-screen-children/About.vue"
+
+const enterModal = ref(null)
+const makeModal = ref(null)
+
+onMounted(() => {
+  store0.value.enterModal = new Modal(enterModal.value)
+  store0.value.makeModal = new Modal(makeModal.value)
+})
 </script>
 
 <template>
@@ -11,11 +21,11 @@ import About from "./outside-screen-children/About.vue"
       <img src="/src/assets/logo.svg" width="180">
       <template v-if="store0.outsideMode == 'menu'">
         <div class="mt-3"><button type="button" class="btn btn-dark" data-bs-toggle="modal"
-            data-bs-target="#enter">部屋に入る</button></div>
+            data-bs-target="#enterModal">部屋に入る</button></div>
         <div class="mt-1"><button type="button" class="btn btn-dark" data-bs-toggle="modal"
-            data-bs-target="#make">部屋を作る</button></div>
+            data-bs-target="#makeModal">部屋を作る</button></div>
         <div class="mt-1"><button type="button" class="btn btn-dark" data-bs-toggle="modal"
-            data-bs-target="#about">このサイトについて</button></div>
+            data-bs-target="#aboutModal">このサイトについて</button></div>
       </template>
       <template v-if="store0.outsideMode == 'message'">
         <h3 class="text-white mt-4">退室しました</h3>
@@ -24,11 +34,11 @@ import About from "./outside-screen-children/About.vue"
       </template>
     </div>
   </div>
-  <div class="modal fade" id="enter" tabindex="-1">
+  <div class="modal fade" id="enterModal" ref="enterModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="enterLabel">部屋に入る</h5>
+          <h5 class="modal-title" id="enterModalLabel">部屋に入る</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
@@ -37,11 +47,11 @@ import About from "./outside-screen-children/About.vue"
       </div>
     </div>
   </div>
-  <div class="modal fade" id="make" tabindex="-1">
+  <div class="modal fade" id="makeModal" ref="makeModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="makeLabel">部屋を作る</h5>
+          <h5 class="modal-title" id="makeModalLabel">部屋を作る</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
@@ -50,11 +60,11 @@ import About from "./outside-screen-children/About.vue"
       </div>
     </div>
   </div>
-  <div class="modal fade" id="about" tabindex="-1">
+  <div class="modal fade" id="aboutModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="aboutLabel">このサイトについて</h5>
+          <h5 class="modal-title" id="aboutModalLabel">このサイトについて</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
