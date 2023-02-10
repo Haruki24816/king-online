@@ -38,13 +38,19 @@ class Room:
             return True
         
     def info(self):
-        player_num = 0
+        return {
+            "room_name": self.name,
+            "player_num": self.player_num()
+        }
+    
+    def player_num(self):
+        num = 0
 
         for player_data in self.players:
             if player_data["status"] != "left":
-                player_num += 1
-
-        return {
-            "room_name": self.name,
-            "player_num": player_num
-        }
+                num += 1
+        
+        return num
+    
+    def owner_exists(self):
+        return self.players[0]["status"] != "left"

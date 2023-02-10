@@ -88,6 +88,9 @@ def leave():
     emit("s0-dist-room-info", {"room_info": room.info()}, to=room_id)
     emit("s0-dist-players-data", {"players": room.players}, to=room_id)
 
+    if ~room.owner_exists():
+        rooms.pop(room_id)
+
 
 @socketio.on("disconnect")
 def disconnect():
@@ -107,6 +110,9 @@ def disconnect():
         room.leave(player_id)
         emit("s0-dist-room-info", {"room_info": room.info()}, to=room_id)
         emit("s0-dist-players-data", {"players": room.players}, to=room_id)
+    
+    if ~room.owner_exists():
+        rooms.pop(room_id)
 
 
 @socketio.on("c0-reconnect")
