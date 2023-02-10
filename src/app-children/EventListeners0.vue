@@ -13,7 +13,7 @@ $socket.on("disconnect", () => {
 })
 
 $socket.on("s0-error-unknown", () => {
-  console.log("s0-error-unknown")
+  store0.value.unknownErrorModal.show()
 })
 
 $socket.on("s0-enter-room", (data) => {

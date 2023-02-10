@@ -14,5 +14,6 @@ export const store0 = ref({
   players: undefined,
   playerNum: undefined,
   enterModal: undefined,
-  makeModal: undefined
+  makeModal: undefined,
+  unknownErrorModal: undefined
 })
