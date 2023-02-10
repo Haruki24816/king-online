@@ -1,25 +1,16 @@
+from errors import EventError0
+
+
 class Room:
 
     def __init__(self, room_name):
-        if len(room_name) == 0:
-            raise Exception("部屋の名前は1文字以上でなければなりません")
-
-        if 100 < len(room_name):
-            raise Exception("部屋の名前は100文字以下でなければなりません")
-
         self.name = room_name
         self.players = []
 
     def add_player(self, player_name):
         for player_data in self.players:
-            if player_data["name"] == player_name:
-                raise Exception("すでに同じ名前のプレイヤーがいます")
-
-        if len(player_name) == 0:
-            raise Exception("プレイヤー名は1文字以上でなければなりません")
-
-        if 100 < len(player_name):
-            raise Exception("プレイヤー名は100文字以下でなければなりません")
+            if player_data["name"] == player_name and player_data["status"] != "left":
+                raise EventError0("s0-error-same-player-name")
 
         self.players.append({
             "name": player_name,
@@ -45,3 +36,15 @@ class Room:
         else:
             status = "online"
             return True
+        
+    def info(self):
+        player_num = 0
+
+        for player_data in self.players:
+            if player_data["status"] != "left":
+                player_num += 1
+
+        return {
+            "room_name": self.name,
+            "player_num": player_num
+        }
