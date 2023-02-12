@@ -34,7 +34,7 @@ class Room:
     def reconnect(self, player_id, sid):
         status = self.players[player_id]["status"]
         self.update_sid(player_id, sid)
-        
+
         if status == "left":
             return False
         else:
@@ -58,6 +58,13 @@ class Room:
 
     def owner_exists(self):
         return self.players[0]["status"] != "left"
-    
+
     def update_sid(self, player_id, sid):
         self.players[player_id]["sid"] = sid
+
+    def change_name(self, player_id, new_name):
+        for player_data in self.players:
+            if player_data["name"] == new_name and player_data["status"] != "left":
+                raise EventError0("s0-error-same-new-name")
+        
+        self.players[player_id]["name"] = new_name
