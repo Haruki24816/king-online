@@ -6,8 +6,8 @@ import EnterRoom from "./outside-screen-children/EnterRoom.vue"
 import MakeRoom from "./outside-screen-children/MakeRoom.vue"
 import About from "./outside-screen-children/About.vue"
 
-const enterModal = ref(null)
-const makeModal = ref(null)
+const enterModal = ref()
+const makeModal = ref()
 
 onMounted(() => {
   store0.value.enterModal = new Modal(enterModal.value)

@@ -3,7 +3,7 @@ import { ref, onMounted } from "vue"
 import { store0 } from "/src/store0.js"
 import { Modal } from "bootstrap"
 
-const unknownErrorModal = ref(null)
+const unknownErrorModal = ref()
 
 onMounted(() => {
   store0.value.unknownErrorModal = new Modal(unknownErrorModal.value)
