@@ -7,50 +7,57 @@ class Room:
         self.name = room_name
         self.players = []
 
-    def add_player(self, player_name):
+    def add_player(self, player_name, sid):
         for player_data in self.players:
             if player_data["name"] == player_name and player_data["status"] != "left":
                 raise EventError0("s0-error-same-player-name")
 
         self.players.append({
             "name": player_name,
-            "status": "online" # online, offline, left
+            "status": "online",  # online, offline, left
+            "sid": sid
         })
 
         return len(self.players) - 1
 
     def leave(self, player_id):
         self.players[player_id]["status"] = "left"
+        self.update_sid(player_id, None)
 
     def offline(self, player_id):
         self.players[player_id]["status"] = "offline"
+        self.update_sid(player_id, None)
 
     def is_offline(self, player_id):
         return self.players[player_id]["status"] == "offline"
 
-    def reconnect(self, player_id):
+    def reconnect(self, player_id, sid):
         status = self.players[player_id]["status"]
-
+        self.update_sid(player_id, sid)
+        
         if status == "left":
             return False
         else:
             status = "online"
             return True
-        
+
     def info(self):
         return {
             "room_name": self.name,
             "player_num": self.player_num()
         }
-    
+
     def player_num(self):
         num = 0
 
         for player_data in self.players:
             if player_data["status"] != "left":
                 num += 1
-        
+
         return num
-    
+
     def owner_exists(self):
         return self.players[0]["status"] != "left"
+    
+    def update_sid(self, player_id, sid):
+        self.players[player_id]["sid"] = sid

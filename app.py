@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory, session
+from flask import Flask, send_from_directory, session, request
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from room import Room
 from errors import EventError0
@@ -42,7 +42,7 @@ def make_room(data):
 
     rooms[room_id] = Room(room_name)
     room = rooms[room_id]
-    player_id = room.add_player(owner_name)
+    player_id = room.add_player(owner_name, request.sid)
 
     session["room_id"] = room_id
     session["player_id"] = player_id
@@ -62,7 +62,7 @@ def enter_room(data):
         raise EventError0("s0-error-no-room-id")
 
     room = rooms[room_id]
-    player_id = room.add_player(player_name)
+    player_id = room.add_player(player_name, request.sid)
 
     session["room_id"] = room_id
     session["player_id"] = player_id
@@ -110,7 +110,7 @@ def disconnect():
         room.leave(player_id)
         emit("s0-dist-room-info", {"room_info": room.info()}, to=room_id)
         emit("s0-dist-players-data", {"players": room.players}, to=room_id)
-    
+
     if ~room.owner_exists():
         rooms.pop(room_id)
 
@@ -122,7 +122,7 @@ def reconnect(data):
 
     room = rooms[room_id]
 
-    if room.reconnect(player_id):
+    if room.reconnect(player_id, request.sid):
         session["room_id"] = room_id
         session["player_id"] = player_id
         join_room(room_id)
