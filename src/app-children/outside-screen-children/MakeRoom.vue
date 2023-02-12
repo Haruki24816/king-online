@@ -30,12 +30,12 @@ function enterKey() {
 
 <template>
   <div class="form-floating mb-3">
-    <input type="text" class="form-control" id="makeRoomName" placeholder="" v-model="roomName"
+    <input type="text" class="form-control" id="makeRoomName" placeholder="_" v-model="roomName"
       @keydown.enter="enterKey">
     <label for="makeRoomName">部屋の名前</label>
   </div>
   <div class="form-floating mb-3">
-    <input type="text" class="form-control" id="makeRoomPlayerName" placeholder="" v-model="ownerName"
+    <input type="text" class="form-control" id="makeRoomPlayerName" placeholder="_" v-model="ownerName"
       @keydown.enter="enterKey">
     <label for="makeRoomPlayerName">あなたの名前</label>
   </div>

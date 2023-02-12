@@ -39,11 +39,11 @@ function enterKey() {
     <div>{{ store0.failedEnterRoomReason }}</div>
   </div>
   <div class="form-floating mb-3">
-    <input type="text" class="form-control" id="enterRoomId" placeholder="" v-model="roomId" @keydown.enter="enterKey">
+    <input type="text" class="form-control" id="enterRoomId" placeholder="_" v-model="roomId" @keydown.enter="enterKey">
     <label for="enterRoomId">部屋のID</label>
   </div>
   <div class="form-floating mb-3">
-    <input type="text" class="form-control" id="enterRoomName" placeholder="" v-model="playerName"
+    <input type="text" class="form-control" id="enterRoomName" placeholder="_" v-model="playerName"
       @keydown.enter="enterKey">
     <label for="enterRoomName">あなたの名前</label>
   </div>
