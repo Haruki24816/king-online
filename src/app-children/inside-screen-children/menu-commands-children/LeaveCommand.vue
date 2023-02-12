@@ -10,7 +10,6 @@ function leave() {
 </script>
 
 <template>
-  <button class="btn btn-light" type="button" data-bs-toggle="modal" data-bs-target="#leaveModal">退室</button>
   <div class="modal fade" id="leaveModal" ref="leaveModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">

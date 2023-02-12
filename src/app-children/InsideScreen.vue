@@ -1,11 +1,12 @@
 <script setup>
+import ReconnectionOverlay from "./inside-screen-children/ReconnectionOverlay.vue"
 import TopBar from "./inside-screen-children/TopBar.vue"
 import InformationPanel from "./inside-screen-children/InformationPanel.vue"
 import MenuPanel from "./inside-screen-children/MenuPanel.vue"
 import GameDisplayPanel from "./inside-screen-children/GameDisplayPanel.vue"
 import GameCommandPanel from "./inside-screen-children/GameCommandPanel.vue"
 import ChatSpacePanel from "./inside-screen-children/ChatSpacePanel.vue"
-import ReconnectionOverlay from "./inside-screen-children/ReconnectionOverlay.vue"
+import MenuCommands from "./inside-screen-children/MenuCommands.vue"
 </script>
 
 <template>
@@ -62,6 +63,7 @@ import ReconnectionOverlay from "./inside-screen-children/ReconnectionOverlay.vu
       <ChatSpacePanel />
     </div>
   </div>
+  <MenuCommands />
 </template>
 
 <style scoped>
