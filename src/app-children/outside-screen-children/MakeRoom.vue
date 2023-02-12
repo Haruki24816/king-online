@@ -7,17 +7,13 @@ const $socket = inject("$socket")
 const roomName = ref("")
 const ownerName = ref("")
 
-const buttonClass = computed(() => {
-  if (1 <= roomName.value.length &&
+const isDisabled = computed(() => {
+  return !(1 <= roomName.value.length &&
     roomName.value.length <= 100 &&
     1 <= ownerName.value.length &&
     ownerName.value.length <= 100 &&
     store0.value.connection &&
-    !store0.value.entranceLock) {
-    return "btn btn-primary"
-  } else {
-    return "btn btn-primary disabled"
-  }
+    !store0.value.entranceLock)
 })
 
 function makeRoom() {
@@ -36,6 +32,6 @@ function makeRoom() {
     <label for="makeRoomPlayerName">あなたの名前</label>
   </div>
   <div class="d-grid gap-2">
-    <button :class="buttonClass" @click="makeRoom">作成</button>
+    <button :class="['btn', 'btn-primary', { 'disabled': isDisabled }]" @click="makeRoom">作成</button>
   </div>
 </template>

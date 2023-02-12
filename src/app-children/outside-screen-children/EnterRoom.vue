@@ -7,16 +7,12 @@ const $socket = inject("$socket")
 const roomId = ref("")
 const playerName = ref("")
 
-const buttonClass = computed(() => {
-  if (roomId.value.length == 8 &&
+const isDisabled = computed(() => {
+  return !(roomId.value.length == 8 &&
     1 <= playerName.value.length &&
     playerName.value.length <= 100 &&
     store0.value.connection &&
-    !store0.value.entranceLock) {
-    return "btn btn-primary"
-  } else {
-    return "btn btn-primary disabled"
-  }
+    !store0.value.entranceLock)
 })
 
 function enterRoom() {
@@ -45,6 +41,6 @@ if (urlId != null && urlId.length == 8) {
     <label for="enterRoomName">あなたの名前</label>
   </div>
   <div class="d-grid gap-2">
-    <button :class="buttonClass" @click="enterRoom">入室</button>
+    <button :class="['btn', 'btn-primary', { 'disabled': isDisabled }]" @click="enterRoom">入室</button>
   </div>
 </template>
