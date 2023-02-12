@@ -13,7 +13,7 @@ onMounted(() => {
   store0.value.enterModal = new Modal(enterModal.value)
   store0.value.makeModal = new Modal(makeModal.value)
   const urlId = store0.value.getUrlId()
-  if (urlId != null && urlId.length == 8) {
+  if (urlId != null && urlId.length == 8 && store0.value.outsideMode == "menu") {
     store0.value.enterModal.show()
   }
 })
