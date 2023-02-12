@@ -24,6 +24,11 @@ function enterRoom() {
   store0.value.failedEnterRoomReason = undefined
   $socket.emit("c0-enter-room", { "room_id": roomId.value, "player_name": playerName.value })
 }
+
+const param = (new URL(location)).searchParams.get("id")
+if (param != null && param.length == 8) {
+  roomId.value = param
+}
 </script>
 
 <template>

@@ -5,6 +5,9 @@ const $socket = inject("$socket")
 
 function leave() {
   $socket.emit("c0-leave")
+  const url = new URL(location)
+  url.searchParams.delete("id")
+  history.replaceState(null, null, url.toString())
   location.reload()
 }
 </script>
