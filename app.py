@@ -88,7 +88,8 @@ def leave():
     emit("s0-dist-room-info", {"room_info": room.info()}, to=room_id)
     emit("s0-dist-players-data", {"players": room.players}, to=room_id)
 
-    if ~room.owner_exists():
+    if room.owner_exists() == False:
+        emit("s0-no-owner", to=room_id)
         rooms.pop(room_id)
 
 
@@ -97,21 +98,22 @@ def disconnect():
     room_id = session.get("room_id")
     player_id = session.get("player_id")
 
-    if room_id == None:
+    if room_id not in rooms:
         return
 
     room = rooms[room_id]
     room.offline(player_id)
 
     emit("s0-dist-players-data", {"players": room.players}, to=room_id)
-    socketio.sleep(60)
+    socketio.sleep(30)
 
     if room.is_offline(player_id):
         room.leave(player_id)
         emit("s0-dist-room-info", {"room_info": room.info()}, to=room_id)
         emit("s0-dist-players-data", {"players": room.players}, to=room_id)
 
-    if ~room.owner_exists():
+    if room.owner_exists() == False:
+        emit("s0-no-owner", to=room_id)
         rooms.pop(room_id)
 
 
@@ -119,6 +121,9 @@ def disconnect():
 def reconnect(data):
     room_id = data["room_id"]
     player_id = data["player_id"]
+
+    if room_id not in rooms:
+        emit("s0-failed-reconnect")
 
     room = rooms[room_id]
 

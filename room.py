@@ -29,6 +29,9 @@ class Room:
         self.update_sid(player_id, None)
 
     def is_offline(self, player_id):
+        print("===")
+        print(self.players[player_id]["status"])
+        print("===")
         return self.players[player_id]["status"] == "offline"
 
     def reconnect(self, player_id, sid):
@@ -38,7 +41,7 @@ class Room:
         if status == "left":
             return False
         else:
-            status = "online"
+            self.players[player_id]["status"] = "online"
             return True
 
     def info(self):
