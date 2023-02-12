@@ -21,7 +21,7 @@ function reload() {
 
 <template>
   <div class="position-relative bg-dark -background">
-    <div class="position-absolute top-50 start-50 translate-middle text-center">
+    <div class="position-absolute top-50 start-50 translate-middle text-center w-100">
       <img src="/src/assets/logo.svg" width="180">
       <template v-if="store0.outsideMode == 'menu'">
         <div class="mt-3"><button type="button" class="btn btn-dark" data-bs-toggle="modal"
