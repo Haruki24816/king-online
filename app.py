@@ -138,18 +138,5 @@ def reconnect(data):
         emit("s0-failed-reconnect")
 
 
-@socketio.on("c0-change-name")
-def change_name(data):
-    new_name = data["new_name"]
-    room_id = session["room_id"]
-    player_id = session["player_id"]
-
-    room = rooms[room_id]
-    room.change_name(player_id, new_name)
-
-    emit("s0-change-name")
-    emit("s0-dist-players-data", {"players": room.players}, to=room_id)
-
-
 if __name__ == "__main__":
     socketio.run(app, debug=True, host="0.0.0.0")

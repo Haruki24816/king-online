@@ -61,10 +61,3 @@ class Room:
 
     def update_sid(self, player_id, sid):
         self.players[player_id]["sid"] = sid
-
-    def change_name(self, player_id, new_name):
-        for player_data in self.players:
-            if player_data["name"] == new_name and player_data["status"] != "left":
-                raise EventError0("s0-error-same-new-name")
-        
-        self.players[player_id]["name"] = new_name
