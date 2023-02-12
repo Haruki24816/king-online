@@ -17,6 +17,7 @@ import { store0 } from "/src/store0.js"
   width: 100vw;
   height: 100vh;
   background-color: #ffffff7f;
+  z-index: 2000;
 }
 
 .-box {
