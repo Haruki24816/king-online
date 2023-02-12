@@ -39,9 +39,7 @@ $socket.on("s0-enter-room", (data) => {
   store0.value.playerId = data.player_id
   store0.value.enterModal.hide()
   store0.value.makeModal.hide()
-  const url = new URL(location)
-  url.searchParams.set("id", data.room_id)
-  history.replaceState(null, null, url.toString())
+  store0.value.setUrlId(data.room_id)
 })
 
 $socket.on("s0-dist-room-info", (data) => {
@@ -79,9 +77,7 @@ $socket.on("s0-no-owner", () => {
   store0.value.outsideMode = "message"
   store0.value.disconnectionReason = "内閣総理大臣が欠けたため、憲法第70条により内閣総辞職となりました"
   $socket.disconnect()
-  const url = new URL(location)
-  url.searchParams.delete("id")
-  history.replaceState(null, null, url.toString())
+  store0.value.deleteUrlId()
 })
 </script>
 

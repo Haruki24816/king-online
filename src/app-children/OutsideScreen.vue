@@ -12,8 +12,8 @@ const makeModal = ref(null)
 onMounted(() => {
   store0.value.enterModal = new Modal(enterModal.value)
   store0.value.makeModal = new Modal(makeModal.value)
-  const param = (new URL(location)).searchParams.get("id")
-  if (param != null && param.length == 8) {
+  const urlId = store0.value.getUrlId()
+  if (urlId != null && urlId.length == 8) {
     store0.value.enterModal.show()
   }
 })

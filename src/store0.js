@@ -15,5 +15,19 @@ export const store0 = ref({
   playerNum: undefined,
   enterModal: undefined,
   makeModal: undefined,
-  unknownErrorModal: undefined
+  unknownErrorModal: undefined,
+  getUrlId() {
+    const url = new URL(location)
+    return url.searchParams.get("id")
+  },
+  setUrlId(urlId) {
+    const url = new URL(location)
+    url.searchParams.set("id", urlId)
+    history.replaceState(null, null, url.toString())
+  },
+  deleteUrlId() {
+    const url = new URL(location)
+    url.searchParams.delete("id")
+    history.replaceState(null, null, url.toString())
+  }
 })

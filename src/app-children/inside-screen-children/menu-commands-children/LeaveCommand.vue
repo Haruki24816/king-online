@@ -1,13 +1,12 @@
 <script setup>
 import { inject } from "vue"
+import { store0 } from "/src/store0.js"
 
 const $socket = inject("$socket")
 
 function leave() {
   $socket.emit("c0-leave")
-  const url = new URL(location)
-  url.searchParams.delete("id")
-  history.replaceState(null, null, url.toString())
+  store0.value.deleteUrlId()
   location.reload()
 }
 </script>

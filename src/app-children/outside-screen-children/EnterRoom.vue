@@ -25,9 +25,9 @@ function enterRoom() {
   $socket.emit("c0-enter-room", { "room_id": roomId.value, "player_name": playerName.value })
 }
 
-const param = (new URL(location)).searchParams.get("id")
-if (param != null && param.length == 8) {
-  roomId.value = param
+const urlId = store0.value.getUrlId()
+if (urlId != null && urlId.length == 8) {
+  roomId.value = urlId
 }
 </script>
 
