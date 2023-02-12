@@ -25,6 +25,12 @@ const urlId = store0.value.getUrlId()
 if (urlId != null && urlId.length == 8) {
   roomId.value = urlId
 }
+
+function enterKey() {
+  if (!isDisabled.value) {
+    enterRoom()
+  }
+}
 </script>
 
 <template>
@@ -33,11 +39,12 @@ if (urlId != null && urlId.length == 8) {
     <div>{{ store0.failedEnterRoomReason }}</div>
   </div>
   <div class="form-floating mb-3">
-    <input type="text" class="form-control" id="enterRoomId" placeholder="" v-model="roomId">
+    <input type="text" class="form-control" id="enterRoomId" placeholder="" v-model="roomId" @keydown.enter="enterKey">
     <label for="enterRoomId">部屋のID</label>
   </div>
   <div class="form-floating mb-3">
-    <input type="text" class="form-control" id="enterRoomName" placeholder="" v-model="playerName">
+    <input type="text" class="form-control" id="enterRoomName" placeholder="" v-model="playerName"
+      @keydown.enter="enterKey">
     <label for="enterRoomName">あなたの名前</label>
   </div>
   <div class="d-grid gap-2">

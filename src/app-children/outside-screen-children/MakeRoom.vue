@@ -20,15 +20,23 @@ function makeRoom() {
   store0.value.entranceLock = true
   $socket.emit("c0-make-room", { "room_name": roomName.value, "owner_name": ownerName.value })
 }
+
+function enterKey() {
+  if (!isDisabled.value) {
+    makeRoom()
+  }
+}
 </script>
 
 <template>
   <div class="form-floating mb-3">
-    <input type="text" class="form-control" id="makeRoomName" placeholder="" v-model="roomName">
+    <input type="text" class="form-control" id="makeRoomName" placeholder="" v-model="roomName"
+      @keydown.enter="enterKey">
     <label for="makeRoomName">部屋の名前</label>
   </div>
   <div class="form-floating mb-3">
-    <input type="text" class="form-control" id="makeRoomPlayerName" placeholder="" v-model="ownerName">
+    <input type="text" class="form-control" id="makeRoomPlayerName" placeholder="" v-model="ownerName"
+      @keydown.enter="enterKey">
     <label for="makeRoomPlayerName">あなたの名前</label>
   </div>
   <div class="d-grid gap-2">
