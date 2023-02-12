@@ -25,7 +25,7 @@ $socket.on("disconnect", () => {
         store0.value.disconnectionReason = "接続を維持できなくなりました"
         $socket.disconnect()
       }
-    }, 60000)
+    }, 70000)
   }
 })
 

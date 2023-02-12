@@ -105,7 +105,7 @@ def disconnect():
     room.offline(player_id)
 
     emit("s0-dist-players-data", {"players": room.players}, to=room_id)
-    socketio.sleep(30)
+    socketio.sleep(60)
 
     if room.is_offline(player_id):
         room.leave(player_id)
