@@ -16,6 +16,7 @@ export const store0 = ref({
   enterModal: undefined,
   makeModal: undefined,
   unknownErrorModal: undefined,
+  modals: {},
   getUrlId() {
     const url = new URL(location)
     return url.searchParams.get("id")
