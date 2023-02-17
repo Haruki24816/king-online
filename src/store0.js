@@ -13,10 +13,11 @@ export const store0 = ref({
   playerId: undefined,
   players: undefined,
   playerNum: undefined,
-  enterModal: undefined,
-  makeModal: undefined,
   unknownErrorModal: undefined,
-  modals: {},
+  modals: {
+    enterRoom: undefined,
+    makeRoom: undefined
+  },
   getUrlId() {
     const url = new URL(location)
     return url.searchParams.get("id")

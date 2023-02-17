@@ -37,8 +37,8 @@ $socket.on("s0-enter-room", (data) => {
   store0.value.appMode = "inside"
   store0.value.roomId = data.room_id
   store0.value.playerId = data.player_id
-  store0.value.enterModal.hide()
-  store0.value.makeModal.hide()
+  store0.value.modals.enterRoom.hide()
+  store0.value.modals.makeRoom.hide()
   store0.value.setUrlId(data.room_id)
 })
 

@@ -1,20 +1,14 @@
 <script setup>
-import { ref, onMounted } from "vue"
+import { onMounted } from "vue"
 import { store0 } from "/src/store0.js"
-import { Modal } from "bootstrap"
 import EnterRoom from "./outside-screen-children/EnterRoom.vue"
 import MakeRoom from "./outside-screen-children/MakeRoom.vue"
 import About from "./outside-screen-children/About.vue"
 
-const enterModal = ref()
-const makeModal = ref()
-
 onMounted(() => {
-  store0.value.enterModal = new Modal(enterModal.value)
-  store0.value.makeModal = new Modal(makeModal.value)
   const urlId = store0.value.getUrlId()
   if (urlId != null && urlId.length == 8 && store0.value.outsideMode == "menu") {
-    store0.value.enterModal.show()
+    store0.value.modals.enterRoom.show()
   }
 })
 
@@ -29,9 +23,9 @@ function reload() {
       <img src="/src/assets/logo.svg" width="180">
       <template v-if="store0.outsideMode == 'menu'">
         <div class="mt-3"><button type="button" class="btn btn-dark" data-bs-toggle="modal"
-            data-bs-target="#enterModal">部屋に入る</button></div>
+            data-bs-target="#enterRoomModal">部屋に入る</button></div>
         <div class="mt-1"><button type="button" class="btn btn-dark" data-bs-toggle="modal"
-            data-bs-target="#makeModal">部屋を作る</button></div>
+            data-bs-target="#makeRoomModal">部屋を作る</button></div>
         <div class="mt-1"><button type="button" class="btn btn-dark" data-bs-toggle="modal"
             data-bs-target="#aboutModal">このサイトについて</button></div>
       </template>
@@ -42,32 +36,8 @@ function reload() {
       </template>
     </div>
   </div>
-  <div class="modal fade" id="enterModal" ref="enterModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="enterModalLabel">部屋に入る</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <EnterRoom />
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="modal fade" id="makeModal" ref="makeModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="makeModalLabel">部屋を作る</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <MakeRoom />
-        </div>
-      </div>
-    </div>
-  </div>
+  <EnterRoom />
+  <MakeRoom />
   <About />
 </template>
 
