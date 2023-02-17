@@ -30,7 +30,7 @@ $socket.on("disconnect", () => {
 })
 
 $socket.on("s0-error-unknown", () => {
-  store0.value.unknownErrorModal.show()
+  store0.value.modals.unknownError.show()
 })
 
 $socket.on("s0-enter-room", (data) => {
