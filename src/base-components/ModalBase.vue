@@ -8,7 +8,7 @@ const stores = [store0]
 const props = defineProps({
   "name": String,
   "title": String,
-  "num": Number
+  "num": String
 })
 const modalElement = ref()
 
