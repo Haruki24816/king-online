@@ -7,6 +7,7 @@ import GameDisplayPanel from "./inside-screen-children/GameDisplayPanel.vue"
 import GameCommandPanel from "./inside-screen-children/GameCommandPanel.vue"
 import ChatSpacePanel from "./inside-screen-children/ChatSpacePanel.vue"
 import MenuCommands from "./inside-screen-children/MenuCommands.vue"
+import OffcanvasBase from "/src/base-components/OffcanvasBase.vue"
 </script>
 
 <template>
@@ -45,24 +46,12 @@ import MenuCommands from "./inside-screen-children/MenuCommands.vue"
       </div>
     </div>
   </div>
-  <div class="offcanvas offcanvas-start -offcanvas-left" tabindex="-1" id="offcanvasLeft">
-    <div class="offcanvas-header">
-      <h5 class="offcanvas-title" id="offcanvasLabel">ゲームメニュー</h5>
-      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
-    </div>
-    <div class="offcanvas-body">
-      <MenuPanel />
-    </div>
-  </div>
-  <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight">
-    <div class="offcanvas-header">
-      <h5 id="offcanvasRightLabel">チャットスペース</h5>
-      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
-    </div>
-    <div class="offcanvas-body">
-      <ChatSpacePanel />
-    </div>
-  </div>
+  <OffcanvasBase name="gameMenu" title="ゲームメニュー" width="240px">
+    <MenuPanel />
+  </OffcanvasBase>
+  <OffcanvasBase name="chatSpace" title="チャットスペース" end>
+    <ChatSpacePanel />
+  </OffcanvasBase>
   <MenuCommands />
 </template>
 
@@ -81,9 +70,5 @@ import MenuCommands from "./inside-screen-children/MenuCommands.vue"
 
 .-overflow {
   height: 0;
-}
-
-.-offcanvas-left {
-  max-width: 240px;
 }
 </style>
