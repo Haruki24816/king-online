@@ -5,7 +5,11 @@ import { Modal } from "bootstrap"
 import { store0 } from "/src/store0.js"
 const stores = [store0]
 
-const props = defineProps(["name", "title", "num"])
+const props = defineProps({
+  "name": String,
+  "title": String,
+  "num": Number
+})
 const modalElement = ref()
 
 onMounted(() => {
