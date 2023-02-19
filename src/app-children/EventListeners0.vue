@@ -20,8 +20,7 @@ $socket.on("disconnect", () => {
     store0.value.overlay = true
     setTimeout(() => {
       if (store0.value.overlay == true) {
-        store0.value.appMode = "outside"
-        store0.value.outsideMode = "message"
+        store0.value.appMode = "disconnection"
         store0.value.disconnectionReason = "接続を維持できなくなりました"
         $socket.disconnect()
       }
@@ -66,15 +65,13 @@ $socket.on("s0-reconnect", () => {
 })
 
 $socket.on("s0-failed-reconnect", () => {
-  store0.value.appMode = "outside"
-  store0.value.outsideMode = "message"
+  store0.value.appMode = "disconnection"
   store0.value.disconnectionReason = "接続を維持できなくなりました"
   $socket.disconnect()
 })
 
 $socket.on("s0-no-owner", () => {
-  store0.value.appMode = "outside"
-  store0.value.outsideMode = "message"
+  store0.value.appMode = "disconnection"
   store0.value.disconnectionReason = "内閣総理大臣が欠けたため、憲法第70条により内閣総辞職となりました"
   $socket.disconnect()
   store0.value.deleteUrlId()

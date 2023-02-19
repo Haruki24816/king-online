@@ -1,8 +1,7 @@
 import { ref } from "vue"
 
 export const store0 = ref({
-  appMode: "outside", // outside, inside
-  outsideMode: "menu", // menu, message
+  appMode: "entrance", // entrance, disconnection, inside
   roomName: undefined,
   disconnectionReason: undefined,
   overlay: false,
@@ -13,11 +12,7 @@ export const store0 = ref({
   playerId: undefined,
   players: undefined,
   playerNum: undefined,
-  modals: {
-    enterRoom: undefined,
-    makeRoom: undefined,
-    unknownError: undefined
-  },
+  modals: {},
   getUrlId() {
     const url = new URL(location)
     return url.searchParams.get("id")
