@@ -76,6 +76,15 @@ $socket.on("s0-no-owner", () => {
   $socket.disconnect()
   store0.value.deleteUrlId()
 })
+
+$socket.on("s0-kick", (data) => {
+  store0.value.appMode = "disconnection"
+  store0.value.disconnectionReason = "キックされました"
+  if (data.reason != "") {
+    store0.value.disconnectionReason += "：" + data.reason
+  }
+  $socket.disconnect()
+})
 </script>
 
 <template></template>

@@ -2,6 +2,9 @@
 import { ref, computed } from "vue"
 import { store0 } from "/src/store0.js"
 import ModalBase from "/src/base-components/ModalBase.vue"
+import { inject } from "vue"
+
+const $socket = inject("$socket")
 
 const reason = ref("")
 const playerId = ref(0)
@@ -11,7 +14,7 @@ const isDisabled = computed(() => {
 })
 
 function kick() {
-  console.log({ "playerId": playerId.value, "reason": reason.value })
+  $socket.emit("c0-kick", { "player_id": playerId.value, "reason": reason.value })
   playerId.value = 0
   reason.value = ""
 }

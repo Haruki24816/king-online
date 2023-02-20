@@ -61,3 +61,6 @@ class Room:
 
     def update_sid(self, player_id, sid):
         self.players[player_id]["sid"] = sid
+
+    def get_sid(self, player_id):
+        return self.players[player_id]["sid"]
