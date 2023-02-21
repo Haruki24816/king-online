@@ -48,6 +48,7 @@ $socket.on("s0-dist-room-info", (data) => {
 
 $socket.on("s0-dist-players-data", (data) => {
   store0.value.players = data.players
+  console.log(data.players)
 })
 
 $socket.on("s0-error-no-room-id", () => {
