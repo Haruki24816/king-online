@@ -147,8 +147,10 @@ def kick(data):
     room = rooms[room_id]
     sid = room.get_sid(player_id)
     room.leave(player_id)
+    
+    if sid != None:
+        emit("s0-kick", {"reason": reason}, to=sid)
 
-    emit("s0-kick", {"reason": reason}, to=sid)
     emit("s0-dist-room-info", {"room_info": room.info()}, to=room_id)
     emit("s0-dist-players-data", {"players": room.players}, to=room_id)
 
