@@ -14,7 +14,7 @@ const isDisabled = computed(() => {
 })
 
 function kick() {
-  $socket.emit("c0-kick", { "player_id": playerId.value, "reason": reason.value })
+  $socket.emit("c0-kick", { "player_id": Number(playerId.value), "reason": reason.value })
   playerId.value = 0
   reason.value = ""
 }
@@ -24,8 +24,8 @@ function kick() {
   <ModalBase name="kick" title="キック" num="0">
     <div class="modal-body">
       <select class="form-select mb-3" v-model="playerId">
-        <option :value="num" v-for="(data, num) in store0.players">
-          {{ num != 0 ? data.name : "プレイヤーを選択してください" }}
+        <option :value="num" v-for="(num, name) in store0.playerNames()">
+          {{ num != 0 ? name : "プレイヤーを選択してください" }}
         </option>
       </select>
       <div class="form-floating">

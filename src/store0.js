@@ -26,5 +26,16 @@ export const store0 = ref({
     const url = new URL(location)
     url.searchParams.delete("id")
     history.replaceState(null, null, url.toString())
+  },
+  playerNames() {
+    const playerNames = {}
+    for (const num in this.players) {
+      const data = this.players[num]
+      if (data.status == "left") {
+        continue
+      }
+      playerNames[data.name] = num
+    }
+    return playerNames
   }
 })
