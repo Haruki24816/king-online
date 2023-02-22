@@ -44,10 +44,12 @@ $socket.on("s0-enter-room", (data) => {
 $socket.on("s0-dist-room-info", (data) => {
   store0.value.roomName = data.room_info.room_name
   store0.value.playerNum = data.room_info.player_num
+  store0.value.roomStatus = data.room_info.room_status
 })
 
 $socket.on("s0-dist-players-data", (data) => {
   store0.value.players = data.players
+  store0.value.myName = data.players[store0.value.playerId].name
   console.log(data.players)
 })
 

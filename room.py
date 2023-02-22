@@ -6,6 +6,7 @@ class Room:
     def __init__(self, room_name):
         self.name = room_name
         self.players = []
+        self.status = "waiting"  # waiting, gaming
 
     def add_player(self, player_name, sid):
         for player_data in self.players:
@@ -44,7 +45,8 @@ class Room:
     def info(self):
         return {
             "room_name": self.name,
-            "player_num": self.player_num()
+            "player_num": self.player_num(),
+            "room_status": self.status
         }
 
     def player_num(self):

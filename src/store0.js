@@ -13,7 +13,8 @@ export const store0 = ref({
   players: undefined,
   playerNum: undefined,
   modals: {},
-  gaming: false,
+  roomStatus: "waiting", // waiting, gaming
+  myName: undefined,
   getUrlId() {
     const url = new URL(location)
     return url.searchParams.get("id")
