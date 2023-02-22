@@ -78,6 +78,13 @@ $socket.on("s0-no-owner", () => {
   store0.value.deleteUrlId()
 })
 
+$socket.on("s0-finish", () => {
+  store0.value.appMode = "disconnection"
+  store0.value.disconnectionReason = "部屋は解散されました"
+  $socket.disconnect()
+  store0.value.deleteUrlId()
+})
+
 $socket.on("s0-kick", (data) => {
   store0.value.appMode = "disconnection"
   store0.value.disconnectionReason = "キックされました"

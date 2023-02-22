@@ -85,7 +85,7 @@ def leave():
     emit("s0-dist-players-data", {"players": room.players}, to=room_id)
 
     if room.owner_exists() == False:
-        emit("s0-no-owner", to=room_id)
+        emit("s0-finish", to=room_id)
         rooms.pop(room_id)
 
 
@@ -147,7 +147,7 @@ def kick(data):
     room = rooms[room_id]
     sid = room.get_sid(player_id)
     room.leave(player_id)
-    
+
     if sid != None:
         emit("s0-kick", {"reason": reason}, to=sid)
 

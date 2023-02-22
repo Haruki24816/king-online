@@ -35,7 +35,7 @@ function kick() {
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
-      <button type="button" :class="['btn', 'btn-primary', { 'disabled': isDisabled }]" data-bs-dismiss="modal"
+      <button type="button" :class="['btn', 'btn btn-danger', { 'disabled': isDisabled }]" data-bs-dismiss="modal"
         @click="kick">キック</button>
     </div>
   </ModalBase>

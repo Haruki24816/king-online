@@ -13,6 +13,7 @@ export const store0 = ref({
   players: undefined,
   playerNum: undefined,
   modals: {},
+  gaming: false,
   getUrlId() {
     const url = new URL(location)
     return url.searchParams.get("id")
