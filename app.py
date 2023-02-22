@@ -1,5 +1,5 @@
 from flask import Flask, send_from_directory, session, request
-from flask_socketio import SocketIO, emit, join_room, leave_room
+from flask_socketio import SocketIO, emit, join_room
 from room import Room
 from errors import EventError0
 import secrets
@@ -81,10 +81,6 @@ def leave():
     room = rooms[room_id]
     room.leave(player_id)
 
-    session.pop("room_id")
-    session.pop("player_id")
-
-    leave_room(room_id)
     emit("s0-dist-room-info", {"room_info": room.info()}, to=room_id)
     emit("s0-dist-players-data", {"players": room.players}, to=room_id)
 
@@ -102,12 +98,16 @@ def disconnect():
         return
 
     room = rooms[room_id]
-    room.offline(player_id)
+    player_status = room.player_status(player_id)
 
+    if player_status != "online":
+        return
+
+    room.offline(player_id)
     emit("s0-dist-players-data", {"players": room.players}, to=room_id)
     socketio.sleep(60)
 
-    if room.is_offline(player_id):
+    if player_status == "offline":
         room.leave(player_id)
         emit("s0-dist-room-info", {"room_info": room.info()}, to=room_id)
         emit("s0-dist-players-data", {"players": room.players}, to=room_id)
