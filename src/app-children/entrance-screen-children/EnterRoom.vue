@@ -21,6 +21,16 @@ function enterRoom() {
     store0.value.entranceLock = true
     store0.value.failedEnterRoomReason = undefined
     $socket.emit("c0-enter-room", { "room_id": roomId.value, "player_name": playerName.value })
+  } else if (roomId.value == "dev_mode") {
+    $socket.disconnect()
+    store0.value.entranceLock = true
+    store0.value.failedEnterRoomReason = undefined
+    store0.value.appMode = "inside"
+    store0.value.roomId = "dev_mode"
+    store0.value.playerId = 0
+    store0.value.modals.enterRoom.hide()
+    store0.value.modals.makeRoom.hide()
+    store0.value.setUrlId("dev_mode")
   }
 }
 
