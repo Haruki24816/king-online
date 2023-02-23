@@ -31,6 +31,7 @@ function enterRoom() {
     store0.value.modals.enterRoom.hide()
     store0.value.modals.makeRoom.hide()
     store0.value.setUrlId("dev_mode")
+    store0.value.players = [{ name: "player" }]
   }
 }
 

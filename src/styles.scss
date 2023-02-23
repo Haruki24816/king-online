@@ -3,3 +3,12 @@
 body {
   background-color: #dee2e6;
 }
+
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
