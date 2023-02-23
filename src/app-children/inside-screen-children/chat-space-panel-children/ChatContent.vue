@@ -10,7 +10,7 @@ const props = defineProps({ data: Object })
       <div>
         <strong>{{ store1.getPlayerName(data.author) }}</strong>
         <span>&nbsp;</span>
-        <small class="text-muted">{{ store1.getTimeString(data.timestamp) }}</small>
+        <small class="text-muted">{{ data.timestamp }}</small>
       </div>
       <div>
         {{ data.content }}
