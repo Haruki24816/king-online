@@ -71,6 +71,7 @@ def enter_room(data):
     emit("s0-enter-room", {"room_id": room_id, "player_id": player_id})
     emit("s0-dist-room-info", {"room_info": room.info()}, to=room_id)
     emit("s0-dist-players-data", {"players": room.players}, to=room_id)
+    emit("s1-join", {"player_id": player_id}, to=room_id)
 
 
 @socketio.on("c0-leave")
@@ -83,6 +84,7 @@ def leave():
 
     emit("s0-dist-room-info", {"room_info": room.info()}, to=room_id)
     emit("s0-dist-players-data", {"players": room.players}, to=room_id)
+    emit("s1-leave", {"player_id": player_id}, to=room_id)
 
     if room.owner_exists() == False:
         emit("s0-finish", to=room_id)
@@ -111,6 +113,7 @@ def disconnect():
         room.leave(player_id)
         emit("s0-dist-room-info", {"room_info": room.info()}, to=room_id)
         emit("s0-dist-players-data", {"players": room.players}, to=room_id)
+        emit("s1-leave", {"player_id": player_id}, to=room_id)
 
     if room.owner_exists() == False:
         emit("s0-no-owner", to=room_id)
@@ -153,6 +156,18 @@ def kick(data):
 
     emit("s0-dist-room-info", {"room_info": room.info()}, to=room_id)
     emit("s0-dist-players-data", {"players": room.players}, to=room_id)
+    emit("s1-kick", {"player_id": player_id}, to=room_id)
+
+
+@socketio.on("c1-message")
+def message(data):
+    message = data["message"]
+    room_id = session["room_id"]
+    player_id = session["player_id"]
+
+    emit("s1-message",
+         {"player_id": player_id, "message": message},
+         to=room_id)
 
 
 if __name__ == "__main__":
