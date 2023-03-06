@@ -1,6 +1,7 @@
 <script setup>
 import { inject } from "vue"
 import { store0 } from "/src/store0.js"
+import { store1 } from "/src/store1.js"
 
 const $socket = inject("$socket")
 
@@ -65,6 +66,12 @@ $socket.on("s0-error-same-player-name", () => {
 
 $socket.on("s0-reconnect", () => {
   store0.value.overlay = false
+  store1.value.chatLog.push({
+    "type": "info",
+    "author": null,
+    "content": "再接続しました",
+    "timestamp": null
+  })
 })
 
 $socket.on("s0-failed-reconnect", () => {
