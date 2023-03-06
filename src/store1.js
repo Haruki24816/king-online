@@ -10,8 +10,14 @@ export const store1 = ref({
   },
   getTimestamp() {
     const date = new Date()
-    const hour = date.getHours()
-    const minute = date.getMinutes()
+    let hour = date.getHours()
+    let minute = date.getMinutes()
+    if (String(hour).length == 1) {
+      hour = "0" + hour
+    }
+    if (String(minute).length == 1) {
+      minute = "0" + minute
+    }
     return hour + ":" + minute
   }
 })
